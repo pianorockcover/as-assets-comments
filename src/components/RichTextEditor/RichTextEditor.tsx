@@ -1,8 +1,16 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React, { createRef, useCallback, useEffect, useState } from "react";
-import { convertToRaw, Editor, EditorState, RichUtils } from "draft-js";
+import {
+	convertToRaw,
+	Editor,
+	EditorState,
+	Modifier,
+	RichUtils,
+} from "draft-js";
 import { RichTextEditorTools } from "./RichTextEditorTools";
 import { draftToMarkdown } from "markdown-draft-js";
+import clsx from "clsx";
+import { LinkPicker } from "./LinkPicker";
 
 const border = "1px solid #d2d2d2";
 
@@ -11,11 +19,15 @@ const useStyles = makeStyles({
 		background: "#ffffff",
 		border,
 		marginBottom: 20,
+		position: "relative",
 	},
 	richEditorArea: {
 		padding: 10,
 		height: 200,
 		overflowY: "auto",
+		transition: "box-shadow .2s linear",
+	},
+	richEditorAreaFocus: {
 		boxShadow: "inset 0px 0px 10px rgba(0, 0, 0, 0.09)",
 	},
 });
@@ -39,6 +51,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
+	const [focus, setFocus] = useState<boolean>();
+
 	useEffect(() => {
 		if (forceClean) {
 			setEditorState(EditorState.createEmpty());
@@ -53,7 +67,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
 			const content = nextEditorState.getCurrentContent();
 			const rawObject = convertToRaw(content);
-			const markdownString = draftToMarkdown(rawObject);
+			const markdownString = draftToMarkdown(rawObject, {
+				styleItems: {
+					ITALIC: {
+						open: () => "*",
+						close: () => "*",
+					},
+				},
+			});
 
 			props.onChange(markdownString);
 		},
@@ -74,9 +95,25 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 		[editorState]
 	);
 
-	const onClickArea = useCallback(
-		() => ref && ref.current && ref.current.focus(),
-		[ref]
+	const onClickArea = useCallback(() => {
+		if (ref && ref.current) {
+			ref.current.focus();
+			setFocus(true);
+		}
+	}, [ref]);
+
+	const onBlur = useCallback(() => setFocus(false), []);
+
+	const [linkPicker, setLinkPicker] = useState<boolean>();
+	const toggleLinkPicker = useCallback(() => setLinkPicker(!linkPicker), [
+		linkPicker,
+	]);
+
+	const createLink = useCallback(
+		(url: string) => {
+			console.log(url);
+		},
+		[editorState]
 	);
 
 	return (
@@ -85,13 +122,21 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 				editorState={editorState}
 				toggleBlockType={toggleBlockType}
 				toggleInlineStyle={toggleInlineStyle}
+				toggleLinkPicker={toggleLinkPicker}
 			/>
-			<div className={classes.richEditorArea} onClick={onClickArea}>
+			<LinkPicker createLink={createLink} open={linkPicker} />
+			<div
+				className={clsx(classes.richEditorArea, {
+					[classes.richEditorAreaFocus]: focus,
+				})}
+				onClick={onClickArea}
+			>
 				<Editor
 					editorState={editorState}
 					onChange={onChange}
 					spellCheck={true}
 					customStyleMap={styleMap}
+					onBlur={onBlur}
 					ref={ref}
 				/>
 			</div>

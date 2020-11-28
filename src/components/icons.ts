@@ -6,6 +6,7 @@ import FormatUnderlined from "@material-ui/icons/FormatUnderlined";
 import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import { SvgIconTypeMap } from "@material-ui/core";
 import SentimentVerySatisfied from "@material-ui/icons/SentimentVerySatisfied";
+import Close from "@material-ui/icons/Close";
 
 const icons: {
 	[key: string]: OverridableComponent<SvgIconTypeMap<{}, "svg">>;
@@ -16,6 +17,7 @@ const icons: {
 	FormatUnderlined,
 	Link,
 	SentimentVerySatisfied,
+	Close,
 };
 
 export const getIcon = (icon: string) => icons[icon];

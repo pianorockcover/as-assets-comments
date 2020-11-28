@@ -16,7 +16,7 @@ const useStyles = makeStyles({
 });
 
 interface ToolControl {
-	type: "inline" | "block";
+	type: "inline" | "block" | "link";
 	icon: string;
 	style: string;
 	disabled?: boolean;
@@ -34,26 +34,14 @@ const controls: ToolControl[] = [
 		style: "ITALIC",
 	},
 	{
-		type: "inline",
-		icon: "FormatUnderlined",
-		style: "UNDERLINE",
-	},
-	{
 		type: "block",
 		style: "unordered-list-item",
 		icon: "List",
 	},
 	{
-		type: "block",
+		type: "link",
 		style: "",
 		icon: "Link",
-		disabled: true,
-	},
-	{
-		type: "block",
-		style: "",
-		icon: "SentimentVerySatisfied",
-		disabled: true,
 	},
 ];
 
@@ -61,12 +49,14 @@ interface RichTextEditorToolsProps {
 	editorState: EditorState;
 	toggleBlockType: (blockType: string) => void;
 	toggleInlineStyle: (inlineStyle: string) => void;
+	toggleLinkPicker: () => void;
 }
 
 export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 	editorState,
 	toggleBlockType,
 	toggleInlineStyle,
+	toggleLinkPicker,
 }: RichTextEditorToolsProps): JSX.Element => {
 	const classes = useStyles();
 	const onToggleControl = useCallback(
@@ -74,13 +64,20 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 			e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 		) => {
 			e.preventDefault();
-			if (type === "block") {
-				toggleBlockType(style);
-			} else {
-				toggleInlineStyle(style);
+
+			switch (type) {
+				case "block":
+					toggleBlockType(style);
+					break;
+				case "inline":
+					toggleInlineStyle(style);
+					break;
+				case "link":
+					toggleLinkPicker();
+					break;
 			}
 		},
-		[toggleBlockType, toggleInlineStyle]
+		[toggleBlockType, toggleInlineStyle, toggleLinkPicker]
 	);
 
 	const currentStyle = editorState.getCurrentInlineStyle();

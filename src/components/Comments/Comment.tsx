@@ -2,7 +2,6 @@ import { Zoom } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
 import ReactMarkdown from "react-markdown";
-import toc from "remark-toc";
 
 const useStyles = makeStyles({
 	comment: {
@@ -39,13 +38,7 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 				<div className={classes.comment}>
 					<div className={classes.author}>{author}</div>
 					<div className={classes.date}>{date}</div>
-					<ReactMarkdown
-						plugins={[toc]}
-						// skipHtml={true}
-						escapeHtml={true}
-						source={text}
-						disallowedTypes={[]}
-					/>
+					<ReactMarkdown>{text}</ReactMarkdown>
 				</div>
 			</CommentContainer>
 		);
