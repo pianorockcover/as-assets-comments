@@ -19,6 +19,7 @@ interface ToolControl {
 	type: "inline" | "block";
 	icon: string;
 	style: string;
+	disabled?: boolean;
 }
 
 const controls: ToolControl[] = [
@@ -41,6 +42,18 @@ const controls: ToolControl[] = [
 		type: "block",
 		style: "unordered-list-item",
 		icon: "List",
+	},
+	{
+		type: "block",
+		style: "",
+		icon: "Link",
+		disabled: true,
+	},
+	{
+		type: "block",
+		style: "",
+		icon: "SentimentVerySatisfied",
+		disabled: true,
 	},
 ];
 
@@ -95,6 +108,7 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 						size="small"
 						onMouseDown={onToggleControl(control)}
 						color={color}
+						disabled={control.disabled}
 					>
 						{IconComponent && <IconComponent />}
 					</IconButton>

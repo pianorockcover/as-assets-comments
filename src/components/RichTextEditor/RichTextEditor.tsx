@@ -14,8 +14,9 @@ const useStyles = makeStyles({
 	},
 	richEditorArea: {
 		padding: 10,
-		minHeight: 200,
+		height: 200,
 		overflowY: "auto",
+		boxShadow: "inset 0px 0px 10px rgba(0, 0, 0, 0.09)",
 	},
 });
 

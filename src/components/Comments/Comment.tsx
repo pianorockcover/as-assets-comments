@@ -1,19 +1,15 @@
 import { Zoom } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-	convertFromRaw,
-	Editor as MarkdownViewer,
-	EditorState,
-} from "draft-js";
-import { noop } from "lodash";
-import { markdownToDraft } from "markdown-draft-js";
 import React from "react";
+import ReactMarkdown from "react-markdown";
+import toc from "remark-toc";
 
 const useStyles = makeStyles({
 	comment: {
 		marginBottom: 10,
 		background: "#e8e8e8",
 		padding: 10,
+		borderRadius: 5,
 	},
 	author: {
 		fontWeight: 500,
@@ -38,20 +34,17 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 	({ author, date, text, ...props }: CommentProps) => {
 		const classes = useStyles();
 
-		const markdownString = text;
-		const rawData = markdownToDraft(markdownString);
-		const contentState = convertFromRaw(rawData);
-		const editorState = EditorState.createWithContent(contentState);
-
 		return (
 			<CommentContainer {...props}>
 				<div className={classes.comment}>
 					<div className={classes.author}>{author}</div>
 					<div className={classes.date}>{date}</div>
-					<MarkdownViewer
-						editorState={editorState}
-						onChange={noop}
-						readOnly={true}
+					<ReactMarkdown
+						plugins={[toc]}
+						// skipHtml={true}
+						escapeHtml={true}
+						source={text}
+						disallowedTypes={[]}
 					/>
 				</div>
 			</CommentContainer>

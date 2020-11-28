@@ -14,13 +14,23 @@ const useStyles = makeStyles({
 		padding: 10,
 		background: "#f5f5f5",
 	},
+
+	"@global": {
+		"*::-webkit-scrollbar": {
+			width: 10,
+		},
+		"*::-webkit-scrollbar-thumb": {
+			backgroundColor: "rgba(0,0,0,.1)",
+			borderRadius: 5,
+		},
+	},
 });
 
 function App() {
 	const classes = useStyles();
+
 	const [comments, setComments] = useState<CommentProps[]>(fakeApiComments);
 	const [forceClean, setForceClean] = useState<number>();
-
 	const [currentComment, setCurrentComment] = useState<string>();
 
 	const leaveComment = useCallback(() => {
@@ -34,6 +44,7 @@ function App() {
 				...comments,
 			]);
 			setForceClean(+new Date());
+			setCurrentComment(undefined);
 		}
 	}, [currentComment, comments]);
 
