@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core/styles";
-import React, { createRef, useCallback, useState } from "react";
+import React, { createRef, useCallback, useEffect, useState } from "react";
 import { convertToRaw, Editor, EditorState, RichUtils } from "draft-js";
 import { RichTextEditorTools } from "./RichTextEditorTools";
 import { draftToMarkdown } from "markdown-draft-js";
@@ -27,14 +27,22 @@ const styleMap = {
 
 interface RichTextEditorProps {
 	onChange: (value: string) => void;
+	forceClean?: number;
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
+	forceClean,
 	...props
 }: RichTextEditorProps): JSX.Element => {
 	const classes = useStyles();
 
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+	useEffect(() => {
+		if (forceClean) {
+			setEditorState(EditorState.createEmpty());
+		}
+	}, [forceClean]);
 
 	const ref = createRef<any>();
 

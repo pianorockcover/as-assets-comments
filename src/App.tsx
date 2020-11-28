@@ -1,10 +1,10 @@
 import { Button } from "@material-ui/core";
 import React, { useCallback, useState } from "react";
 import { RichTextEditor } from "./components/RichTextEditor/RichTextEditor";
-import { noop } from "lodash";
 import { makeStyles } from "@material-ui/core/styles";
 import { CommentProps } from "./components/Comments/Comment";
 import { Comments } from "./components/Comments/Comments";
+import fakeApiComments from "./fake-api.json";
 
 const useStyles = makeStyles({
 	appWrapper: {
@@ -18,13 +18,13 @@ const useStyles = makeStyles({
 
 function App() {
 	const classes = useStyles();
-	const [comments, setComments] = useState<CommentProps[]>([]);
+	const [comments, setComments] = useState<CommentProps[]>(fakeApiComments);
+	const [forceClean, setForceClean] = useState<number>();
 
 	const [currentComment, setCurrentComment] = useState<string>();
 
-	const leaveComment = useCallback(
-		() =>
-			currentComment &&
+	const leaveComment = useCallback(() => {
+		if (currentComment) {
 			setComments([
 				{
 					author: "Тест Тестов",
@@ -32,13 +32,17 @@ function App() {
 					text: currentComment,
 				},
 				...comments,
-			]),
-		[currentComment, comments]
-	);
+			]);
+			setForceClean(+new Date());
+		}
+	}, [currentComment, comments]);
 
 	return (
 		<div className={classes.appWrapper}>
-			<RichTextEditor onChange={setCurrentComment} />
+			<RichTextEditor
+				onChange={setCurrentComment}
+				forceClean={forceClean}
+			/>
 			<Button
 				variant="contained"
 				color="primary"

@@ -1,12 +1,15 @@
-import { CssBaseline } from "@material-ui/core";
+import { CssBaseline, ThemeProvider } from "@material-ui/core";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
+import { customTheme } from "./customTheme";
 
 ReactDOM.render(
 	<React.StrictMode>
 		<CssBaseline />
-		<App />
+		<ThemeProvider theme={customTheme}>
+			<App />
+		</ThemeProvider>
 	</React.StrictMode>,
 	document.getElementById("root")
 );
