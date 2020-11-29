@@ -58,7 +58,7 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 }) => {
 	const classes = useStyles();
 
-	const [url, setUrl] = useState<string>();
+	const [url, setUrl] = useState<string>("");
 	const [error, setError] = useState<boolean>();
 
 	const prevOpenStatus = useRef(open);
