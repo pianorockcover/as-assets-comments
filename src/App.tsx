@@ -45,6 +45,8 @@ function App() {
 			]);
 			setForceClean(+new Date());
 			setCurrentComment(undefined);
+
+			console.log(currentComment);
 		}
 	}, [currentComment, comments]);
 

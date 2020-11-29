@@ -1,8 +1,13 @@
 [
-    {
-        "author": "Контролер Актива",
-        "date": "22.03.2020 05:40",
-        "text": "Lorem **ipsum dolor** sit amet consectetur adipisicing elit. Officiis suscipit veritatis maiores quas debitis, culpa vero soluta, esse aliquid dignissimos deserunt temporibus incidunt ipsum modi necessitatibus distinctio tenetur eos nobis. Officiis suscipit veritatis maiores quas debitis, culpa vero soluta, esse aliquid dignissimos deserunt temporibus incidunt ipsum modi necessitatibus distinctio tenetur eos nobis.\n\nLorem **ipsum dolor** sit amet consectetur adipisicing elit it amet consectetur adipisicing elit.",
-        "visible": true
-    }
+	{
+		"author": "Контролер Актива",
+		"date": "22.03.2020 05:40",
+		"text": "Не соглашусь с вами каллега, актив **таки очень плох.**",
+		"visible": true
+	},
+	{
+		"author": "Контролер Операторович",
+		"date": "02.03.2020 09:40",
+		"text": "### Хороший актив\nЭтот актив настолько хорош, что даже не могу описать насколько он **офигенен**.\nВсе криетрии в поряде:\n1. Первый критерий\n2. Второй критерий\n3. Третий ваще огонь.\n\nДаже [ссылку](http://localhost:3000/as-assets/1) на него оставлю, вот насколько *очипифигитительный актив.*"
+	}
 ]
