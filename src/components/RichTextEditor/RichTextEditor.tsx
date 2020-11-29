@@ -109,13 +109,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 		linkPicker,
 	]);
 
-	const createLink = useCallback(
-		(url: string) => {
-			console.log(url);
-		},
-		[editorState]
-	);
-
 	return (
 		<div className={classes.richEditorWrapper}>
 			<RichTextEditorTools
@@ -124,7 +117,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 				toggleInlineStyle={toggleInlineStyle}
 				toggleLinkPicker={toggleLinkPicker}
 			/>
-			<LinkPicker createLink={createLink} open={linkPicker} />
+			<LinkPicker
+				editorState={editorState}
+				toggleLinkPicker={toggleLinkPicker}
+				open={linkPicker}
+				setEditorState={setEditorState}
+			/>
 			<div
 				className={clsx(classes.richEditorArea, {
 					[classes.richEditorAreaFocus]: focus,
