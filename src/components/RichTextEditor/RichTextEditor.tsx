@@ -11,6 +11,7 @@ import { RichTextEditorTools } from "./RichTextEditorTools";
 import { draftToMarkdown } from "markdown-draft-js";
 import clsx from "clsx";
 import { LinkPicker } from "./LinkPicker";
+import { richTextEditorDecorators } from "./decorators";
 
 const border = "1px solid #d2d2d2";
 
@@ -20,21 +21,32 @@ const useStyles = makeStyles({
 		border,
 		marginBottom: 20,
 		position: "relative",
+		transition: "border .2s ease-in-out",
+	},
+	richEditorWrapperFocus: {
+		borderColor: "#4dd0e1",
 	},
 	richEditorArea: {
 		padding: 10,
 		height: 200,
 		overflowY: "auto",
-		transition: "box-shadow .2s linear",
+		transition: "box-shadow .2s ease-in-out",
 	},
 	richEditorAreaFocus: {
-		boxShadow: "inset 0px 0px 10px rgba(0, 0, 0, 0.09)",
+		boxShadow: "inset 0px 0px 10px #caefff",
+	},
+	toolsUnfocus: {
+		opacity: 0.95,
+		transition: "opacity .2s ease-in-out",
 	},
 });
 
 const styleMap = {
 	BOLD: {
 		fontWeight: 600,
+	},
+	LINK: {
+		color: "#0088bb",
 	},
 };
 
@@ -49,7 +61,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }: RichTextEditorProps): JSX.Element => {
 	const classes = useStyles();
 
-	const [editorState, setEditorState] = useState(EditorState.createEmpty());
+	const [editorState, setEditorState] = useState(
+		EditorState.createEmpty(richTextEditorDecorators)
+	);
 
 	const [focus, setFocus] = useState<boolean>();
 
@@ -110,12 +124,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 	]);
 
 	return (
-		<div className={classes.richEditorWrapper}>
+		<div
+			className={clsx(classes.richEditorWrapper, {
+				[classes.richEditorWrapperFocus]: focus,
+			})}
+		>
 			<RichTextEditorTools
 				editorState={editorState}
 				toggleBlockType={toggleBlockType}
 				toggleInlineStyle={toggleInlineStyle}
 				toggleLinkPicker={toggleLinkPicker}
+				className={!focus ? classes.toolsUnfocus : undefined}
 			/>
 			<LinkPicker
 				editorState={editorState}

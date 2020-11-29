@@ -1,8 +1,10 @@
 import { Fade, IconButton, makeStyles, TextField } from "@material-ui/core";
+import clsx from "clsx";
 import { EditorState, RichUtils } from "draft-js";
 import React, {
 	ChangeEvent,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -15,15 +17,26 @@ const useStyles = makeStyles({
 		left: 0,
 		zIndex: 2,
 		position: "absolute",
-		borderBottom: "1px solid #d2d2d2",
 		background: "#fafdff",
-		borderRight: "1px solid #d2d2d2",
+		borderBottom: "1px solid #d2d2d2",
 		boxShadow: "1px 1px 4px 0px #e4e1e1",
-		borderBottomRightRadius: 5,
 		padding: 5,
 		display: "flex",
 		alignItems: "center",
-		justifyContent: "center",
+		justifyContent: "flex-start",
+		paddingLeft: 10,
+		width: "100%",
+	},
+	input: {
+		border: 0,
+		borderBottom: "2px solid #0088bb",
+		marginRight: 10,
+		background: "transparent",
+		outline: "none !important",
+		transition: "border .2s ease-in-out",
+	},
+	inputError: {
+		borderBottom: "2px solid #ee1d1d",
 	},
 });
 
@@ -46,11 +59,15 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 	const classes = useStyles();
 
 	const [url, setUrl] = useState<string>();
+	const [error, setError] = useState<boolean>();
 
 	const prevOpenStatus = useRef(open);
 
-	useMemo(() => {
+	useEffect(() => {
 		if (prevOpenStatus.current !== open) {
+			setUrl("");
+			setError(false);
+
 			prevOpenStatus.current = open;
 			const selection = editorState.getSelection();
 
@@ -71,48 +88,64 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 					return;
 				}
 			}
-			setUrl(undefined);
 		}
 	}, [open, editorState]);
 
-	const onChange = useCallback(
-		(e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value),
-		[]
+	const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		e.preventDefault();
+		setUrl(e.target.value);
+
+		if (e.target.value) {
+			setError(false);
+		}
+	}, []);
+
+	const saveUrl = useCallback(
+		(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+			e.preventDefault();
+
+			if (!url) {
+				setError(true);
+				return;
+			}
+
+			const contentState = editorState.getCurrentContent();
+			const contentStateWithEntity = contentState.createEntity(
+				"LINK",
+				"MUTABLE",
+				{ url }
+			);
+			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+			const newEditorState = EditorState.set(editorState, {
+				currentContent: contentStateWithEntity,
+			});
+
+			setEditorState(
+				RichUtils.toggleLink(
+					newEditorState,
+					newEditorState.getSelection(),
+					entityKey
+				)
+			);
+			setUrl("");
+			toggleLinkPicker();
+		},
+		[editorState, setEditorState, toggleLinkPicker, url]
 	);
-
-	const saveUrl = useCallback(() => {
-		const contentState = editorState.getCurrentContent();
-		const contentStateWithEntity = contentState.createEntity(
-			"LINK",
-			"MUTABLE",
-			{ url }
-		);
-		const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-		const newEditorState = EditorState.set(editorState, {
-			currentContent: contentStateWithEntity,
-		});
-
-		setEditorState(
-			RichUtils.toggleLink(
-				newEditorState,
-				newEditorState.getSelection(),
-				entityKey
-			)
-		);
-		setUrl(undefined);
-		toggleLinkPicker();
-	}, [editorState, url]);
 
 	return (
 		<Fade in={open}>
 			<div className={classes.linkPicker}>
-				<TextField
-					size="small"
+				<input
+					type="text"
 					placeholder="Введите URL:"
-					value={url}
 					onChange={onChange}
+					value={url}
+					className={clsx(classes.input, {
+						[classes.inputError]: error,
+					})}
 				/>
-				<IconButton size="small" onClick={saveUrl}>
+				<IconButton size="small" onMouseDown={saveUrl}>
 					<CheckIcon />
 				</IconButton>
 				<IconButton size="small" onClick={toggleLinkPicker}>

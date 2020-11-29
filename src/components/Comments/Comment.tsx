@@ -38,6 +38,7 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 				<div className={classes.comment}>
 					<div className={classes.author}>{author}</div>
 					<div className={classes.date}>{date}</div>
+					{/* TODO: заюзать: @crossfield/react-read-more */}
 					<ReactMarkdown>{text}</ReactMarkdown>
 				</div>
 			</CommentContainer>

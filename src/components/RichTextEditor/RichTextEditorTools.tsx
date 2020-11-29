@@ -3,6 +3,7 @@ import React, { useCallback } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { getIcon } from "../icons";
 import { EditorState } from "draft-js";
+import clsx from "clsx";
 
 const useStyles = makeStyles({
 	richEditorTools: {
@@ -13,11 +14,22 @@ const useStyles = makeStyles({
 		borderRadius: 0,
 		borderRight: "1px solid #d2d2d2",
 	},
+	textIcon: {
+		fontWeight: 400,
+		fontSize: 15,
+		height: 24,
+		alignItems: "center",
+		justifyContent: "center",
+		display: "flex",
+		paddingLeft: 3,
+		paddingRight: 3,
+	},
 });
 
 interface ToolControl {
 	type: "inline" | "block" | "link";
-	icon: string;
+	icon?: string;
+	text?: string;
 	style: string;
 	disabled?: boolean;
 }
@@ -39,6 +51,21 @@ const controls: ToolControl[] = [
 		icon: "List",
 	},
 	{
+		type: "block",
+		style: "ordered-list-item",
+		icon: "FormatListNumberedIcon",
+	},
+	{
+		type: "block",
+		style: "header-two",
+		text: "Заголовок",
+	},
+	{
+		type: "block",
+		style: "header-three",
+		text: "Подзаголовок",
+	},
+	{
 		type: "link",
 		style: "",
 		icon: "Link",
@@ -50,6 +77,7 @@ interface RichTextEditorToolsProps {
 	toggleBlockType: (blockType: string) => void;
 	toggleInlineStyle: (inlineStyle: string) => void;
 	toggleLinkPicker: () => void;
+	className?: string;
 }
 
 export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
@@ -57,6 +85,7 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 	toggleBlockType,
 	toggleInlineStyle,
 	toggleLinkPicker,
+	className,
 }: RichTextEditorToolsProps): JSX.Element => {
 	const classes = useStyles();
 	const onToggleControl = useCallback(
@@ -88,9 +117,9 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 		.getType();
 
 	return (
-		<div className={classes.richEditorTools}>
+		<div className={clsx(classes.richEditorTools, className)}>
 			{controls.map((control, i) => {
-				const IconComponent = getIcon(control.icon);
+				const IconComponent = control.icon && getIcon(control.icon);
 				const color =
 					(control.type === "inline" &&
 						currentStyle.has(control.style)) ||
@@ -108,6 +137,11 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 						disabled={control.disabled}
 					>
 						{IconComponent && <IconComponent />}
+						{control.text && (
+							<span className={classes.textIcon}>
+								{control.text}
+							</span>
+						)}
 					</IconButton>
 				);
 			})}
