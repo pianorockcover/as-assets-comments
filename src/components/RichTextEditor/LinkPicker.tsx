@@ -89,7 +89,7 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 				}
 			}
 		}
-	}, [open, editorState]);
+	}, [open]);
 
 	const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();

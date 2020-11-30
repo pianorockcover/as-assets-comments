@@ -81,6 +81,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
 			const content = nextEditorState.getCurrentContent();
 			const rawObject = convertToRaw(content);
+
+			// TODO: кастомный маппер в markdown
+			console.log(content, rawObject);
+
 			const markdownString = draftToMarkdown(rawObject, {
 				styleItems: {
 					ITALIC: {
@@ -136,12 +140,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 				toggleLinkPicker={toggleLinkPicker}
 				className={!focus ? classes.toolsUnfocus : undefined}
 			/>
-			<LinkPicker
-				editorState={editorState}
-				toggleLinkPicker={toggleLinkPicker}
-				open={linkPicker}
-				setEditorState={setEditorState}
-			/>
+			{linkPicker && (
+				<LinkPicker
+					editorState={editorState}
+					toggleLinkPicker={toggleLinkPicker}
+					open={linkPicker}
+					setEditorState={setEditorState}
+				/>
+			)}
 			<div
 				className={clsx(classes.richEditorArea, {
 					[classes.richEditorAreaFocus]: focus,
