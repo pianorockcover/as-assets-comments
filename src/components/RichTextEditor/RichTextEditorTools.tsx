@@ -76,7 +76,7 @@ interface RichTextEditorToolsProps {
 	editorState: EditorState;
 	toggleBlockType: (blockType: string) => void;
 	toggleInlineStyle: (inlineStyle: string) => void;
-	toggleLinkPicker: () => void;
+	openLinkPicker: () => void;
 	className?: string;
 }
 
@@ -84,7 +84,7 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 	editorState,
 	toggleBlockType,
 	toggleInlineStyle,
-	toggleLinkPicker,
+	openLinkPicker,
 	className,
 }: RichTextEditorToolsProps): JSX.Element => {
 	const classes = useStyles();
@@ -102,11 +102,11 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 					toggleInlineStyle(style);
 					break;
 				case "link":
-					toggleLinkPicker();
+					openLinkPicker();
 					break;
 			}
 		},
-		[toggleBlockType, toggleInlineStyle, toggleLinkPicker]
+		[toggleBlockType, toggleInlineStyle, openLinkPicker]
 	);
 
 	const currentStyle = editorState.getCurrentInlineStyle();

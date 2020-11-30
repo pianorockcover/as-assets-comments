@@ -44,55 +44,39 @@ const CloseIcon = getIcon("Close")!;
 const CheckIcon = getIcon("Check")!;
 
 interface LinkPickerProps {
-	open?: boolean;
 	editorState: EditorState;
 	setEditorState: (editorState: EditorState) => void;
-	toggleLinkPicker: () => void;
+	closeLinkPicker: () => void;
 }
 
 export const LinkPicker: React.FC<LinkPickerProps> = ({
-	open,
-	toggleLinkPicker,
+	closeLinkPicker,
 	editorState,
 	setEditorState,
 }) => {
 	const classes = useStyles();
 
-	const [url, setUrl] = useState<string>("");
 	const [error, setError] = useState<boolean>();
 
-	const prevOpenStatus = useRef(open);
+	const selection = editorState.getSelection();
 
-	useEffect(() => {
-		if (prevOpenStatus.current !== open) {
-			setUrl("");
-			setError(false);
+	// let presetUrl = "";
+	// if (!selection.isCollapsed()) {
+	// 	const contentState = editorState.getCurrentContent();
+	// 	const startKey = editorState.getSelection().getStartKey();
+	// 	const startOffset = editorState.getSelection().getStartOffset();
+	// 	const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
+	// 	const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
 
-			prevOpenStatus.current = open;
-			const selection = editorState.getSelection();
+	// 	if (linkKey) {
+	// 		const linkInstance = contentState.getEntity(linkKey);
+	// 		presetUrl = linkInstance.getData().url;
+	// 	}
+	// }
 
-			if (!selection.isCollapsed()) {
-				const contentState = editorState.getCurrentContent();
-				const startKey = editorState.getSelection().getStartKey();
-				const startOffset = editorState.getSelection().getStartOffset();
-				const blockWithLinkAtBeginning = contentState.getBlockForKey(
-					startKey
-				);
-				const linkKey = blockWithLinkAtBeginning.getEntityAt(
-					startOffset
-				);
-
-				if (linkKey) {
-					const linkInstance = contentState.getEntity(linkKey);
-					setUrl(linkInstance.getData().url);
-					return;
-				}
-			}
-		}
-	}, [open]);
+	const [url, setUrl] = useState<string>("");
 
 	const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		e.preventDefault();
 		setUrl(e.target.value);
 
 		if (e.target.value) {
@@ -128,13 +112,13 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 				)
 			);
 			setUrl("");
-			toggleLinkPicker();
+			closeLinkPicker();
 		},
-		[editorState, setEditorState, toggleLinkPicker, url]
+		[editorState, setEditorState, closeLinkPicker, url]
 	);
 
 	return (
-		<Fade in={open}>
+		<Fade in={true}>
 			<div className={classes.linkPicker}>
 				<input
 					type="text"
@@ -148,7 +132,7 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 				<IconButton size="small" onMouseDown={saveUrl}>
 					<CheckIcon />
 				</IconButton>
-				<IconButton size="small" onClick={toggleLinkPicker}>
+				<IconButton size="small" onClick={closeLinkPicker}>
 					<CloseIcon />
 				</IconButton>
 			</div>

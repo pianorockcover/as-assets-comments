@@ -1,5 +1,11 @@
 import { makeStyles } from "@material-ui/core/styles";
-import React, { createRef, useCallback, useEffect, useState } from "react";
+import React, {
+	createRef,
+	SyntheticEvent,
+	useCallback,
+	useEffect,
+	useState,
+} from "react";
 import {
 	convertToRaw,
 	Editor,
@@ -75,15 +81,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
 	const ref = createRef<any>();
 
-	const onChange = useCallback(
-		(nextEditorState: EditorState) => {
-			setEditorState(nextEditorState);
-
-			const content = nextEditorState.getCurrentContent();
+	const onBlur = useCallback(
+		() => {
+			setFocus(false);
+			const content = editorState.getCurrentContent();
 			const rawObject = convertToRaw(content);
-
-			// TODO: кастомный маппер в markdown
-			console.log(content, rawObject);
 
 			const markdownString = draftToMarkdown(rawObject, {
 				styleItems: {
@@ -94,9 +96,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 				},
 			});
 
+			// TODO: кастомный маппер в markdown
+			console.log(rawObject, markdownString);
+
 			props.onChange(markdownString);
 		},
-		[props.onChange]
+		[props.onChange, editorState]
+	);
+
+	const onChange = useCallback(
+		(nextEditorState: EditorState) => setEditorState(nextEditorState),
+		[]
 	);
 
 	const toggleBlockType = useCallback(
@@ -120,12 +130,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 		}
 	}, [ref]);
 
-	const onBlur = useCallback(() => setFocus(false), []);
-
 	const [linkPicker, setLinkPicker] = useState<boolean>();
-	const toggleLinkPicker = useCallback(() => setLinkPicker(!linkPicker), [
-		linkPicker,
-	]);
+
+	const openLinkPicker = useCallback(() => {
+		const selection = editorState.getSelection();
+		if (!selection.isEmpty()) {
+			setLinkPicker(true);
+		}
+	}, [editorState]);
+
+	const closeLinkPicker = useCallback(() => {
+		setLinkPicker(false);
+	}, [onClickArea]);
 
 	return (
 		<div
@@ -137,14 +153,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 				editorState={editorState}
 				toggleBlockType={toggleBlockType}
 				toggleInlineStyle={toggleInlineStyle}
-				toggleLinkPicker={toggleLinkPicker}
+				openLinkPicker={openLinkPicker}
 				className={!focus ? classes.toolsUnfocus : undefined}
 			/>
 			{linkPicker && (
 				<LinkPicker
 					editorState={editorState}
-					toggleLinkPicker={toggleLinkPicker}
-					open={linkPicker}
+					closeLinkPicker={closeLinkPicker}
 					setEditorState={setEditorState}
 				/>
 			)}
