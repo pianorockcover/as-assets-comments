@@ -34,6 +34,8 @@ const useStyles = makeStyles({
 		background: "transparent",
 		outline: "none !important",
 		transition: "border .2s ease-in-out",
+		paddingTop: 3,
+		paddingBottom: 3,
 	},
 	inputError: {
 		borderBottom: "2px solid #ee1d1d",
@@ -93,24 +95,26 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 				return;
 			}
 
-			const contentState = editorState.getCurrentContent();
-			const contentStateWithEntity = contentState.createEntity(
-				"LINK",
-				"MUTABLE",
-				{ url }
-			);
-			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-			const newEditorState = EditorState.set(editorState, {
-				currentContent: contentStateWithEntity,
-			});
+			
 
-			setEditorState(
-				RichUtils.toggleLink(
-					newEditorState,
-					newEditorState.getSelection(),
-					entityKey
-				)
-			);
+			// const contentState = editorState.getCurrentContent();
+			// const contentStateWithEntity = contentState.createEntity(
+			// 	"LINK",
+			// 	"MUTABLE",
+			// 	{ url }
+			// );
+			// const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+			// const newEditorState = EditorState.set(editorState, {
+			// 	currentContent: contentStateWithEntity,
+			// });
+
+			// setEditorState(
+			// 	RichUtils.toggleLink(
+			// 		newEditorState,
+			// 		newEditorState.getSelection(),
+			// 		entityKey
+			// 	)
+			// );
 			setUrl("");
 			closeLinkPicker();
 		},

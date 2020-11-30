@@ -1,9 +1,10 @@
-import { IconButton } from "@material-ui/core";
+import { IconButton, Tooltip } from "@material-ui/core";
 import React, { useCallback } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { getIcon } from "../icons";
 import { EditorState } from "draft-js";
 import clsx from "clsx";
+import { richTextControls, ToolControl } from "./toolControls";
 
 const useStyles = makeStyles({
 	richEditorTools: {
@@ -25,52 +26,6 @@ const useStyles = makeStyles({
 		paddingRight: 3,
 	},
 });
-
-interface ToolControl {
-	type: "inline" | "block" | "link";
-	icon?: string;
-	text?: string;
-	style: string;
-	disabled?: boolean;
-}
-
-const controls: ToolControl[] = [
-	{
-		type: "inline",
-		icon: "FormatBold",
-		style: "BOLD",
-	},
-	{
-		type: "inline",
-		icon: "FormatItalic",
-		style: "ITALIC",
-	},
-	{
-		type: "block",
-		style: "unordered-list-item",
-		icon: "List",
-	},
-	{
-		type: "block",
-		style: "ordered-list-item",
-		icon: "FormatListNumberedIcon",
-	},
-	{
-		type: "block",
-		style: "header-two",
-		text: "Заголовок",
-	},
-	{
-		type: "block",
-		style: "header-three",
-		text: "Подзаголовок",
-	},
-	{
-		type: "link",
-		style: "",
-		icon: "Link",
-	},
-];
 
 interface RichTextEditorToolsProps {
 	editorState: EditorState;
@@ -118,7 +73,7 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 
 	return (
 		<div className={clsx(classes.richEditorTools, className)}>
-			{controls.map((control, i) => {
+			{richTextControls.map((control, i) => {
 				const IconComponent = control.icon && getIcon(control.icon);
 				const color =
 					(control.type === "inline" &&
@@ -128,21 +83,27 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
 						: "default";
 
 				return (
-					<IconButton
-						key={i}
-						className={classes.btn}
-						size="small"
-						onMouseDown={onToggleControl(control)}
-						color={color}
-						disabled={control.disabled}
+					<Tooltip
+						placement="bottom"
+						title={control.tooltip || ""}
+						arrow={true}
 					>
-						{IconComponent && <IconComponent />}
-						{control.text && (
-							<span className={classes.textIcon}>
-								{control.text}
-							</span>
-						)}
-					</IconButton>
+						<IconButton
+							key={i}
+							className={classes.btn}
+							size="small"
+							onMouseDown={onToggleControl(control)}
+							color={color}
+							disabled={control.disabled}
+						>
+							{IconComponent && <IconComponent />}
+							{control.text && (
+								<span className={classes.textIcon}>
+									{control.text}
+								</span>
+							)}
+						</IconButton>
+					</Tooltip>
 				);
 			})}
 		</div>

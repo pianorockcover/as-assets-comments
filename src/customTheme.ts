@@ -6,4 +6,12 @@ export const customTheme = createMuiTheme({
 			main: "#0088bb",
 		},
 	},
+	overrides: {
+		MuiTooltip: {
+			tooltip: {
+				fontSize: 13,
+				fontWeight: 400,
+			}
+		}
+	}
 });

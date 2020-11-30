@@ -18,6 +18,7 @@ import { draftToMarkdown } from "markdown-draft-js";
 import clsx from "clsx";
 import { LinkPicker } from "./LinkPicker";
 import { richTextEditorDecorators } from "./decorators";
+import { convertToMarkdown } from "./convertToMarkdown";
 
 const border = "1px solid #d2d2d2";
 
@@ -81,28 +82,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
 	const ref = createRef<any>();
 
-	const onBlur = useCallback(
-		() => {
-			setFocus(false);
-			const content = editorState.getCurrentContent();
-			const rawObject = convertToRaw(content);
-
-			const markdownString = draftToMarkdown(rawObject, {
-				styleItems: {
-					ITALIC: {
-						open: () => "*",
-						close: () => "*",
-					},
-				},
-			});
-
-			// TODO: кастомный маппер в markdown
-			console.log(rawObject, markdownString);
-
-			props.onChange(markdownString);
-		},
-		[props.onChange, editorState]
-	);
+	const onBlur = useCallback(() => {
+		setFocus(false);
+	}, [editorState]);
 
 	const onChange = useCallback(
 		(nextEditorState: EditorState) => setEditorState(nextEditorState),
@@ -134,14 +116,45 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
 	const openLinkPicker = useCallback(() => {
 		const selection = editorState.getSelection();
-		if (!selection.isEmpty()) {
+		if (!selection.isEmpty() && !selection.isCollapsed()) {
 			setLinkPicker(true);
 		}
 	}, [editorState]);
 
 	const closeLinkPicker = useCallback(() => {
 		setLinkPicker(false);
-	}, [onClickArea]);
+	}, [editorState]);
+
+	const addLink = useCallback(
+		(e: any) => {
+			e.preventDefault();
+			const url = "text.com";
+
+			const contentState = editorState.getCurrentContent();
+			const contentStateWithEntity = contentState.createEntity(
+				"LINK",
+				"MUTABLE",
+				{ url }
+			);
+			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+			const newEditorState = EditorState.set(editorState, {
+				currentContent: contentStateWithEntity,
+			});
+
+			setEditorState(
+				RichUtils.toggleLink(
+					newEditorState,
+					newEditorState.getSelection(),
+					entityKey
+				)
+			);
+		},
+		[editorState]
+	);
+
+	useEffect(() => {
+		props.onChange(convertToMarkdown(editorState));
+	}, [props.onChange, editorState]);
 
 	return (
 		<div
@@ -149,6 +162,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 				[classes.richEditorWrapperFocus]: focus,
 			})}
 		>
+			<button onClick={addLink}>AddLink</button>
 			<RichTextEditorTools
 				editorState={editorState}
 				toggleBlockType={toggleBlockType}
