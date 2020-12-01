@@ -1,10 +1,11 @@
 import { IconButton, Tooltip } from "@material-ui/core";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { getIcon } from "../icons";
-import { EditorState } from "draft-js";
+import { EditorState, RichUtils } from "draft-js";
 import clsx from "clsx";
 import { richTextControls, ToolControl } from "./toolControls";
+import { LinkPicker } from "./LinkPicker";
 
 const useStyles = makeStyles({
 	richEditorTools: {
@@ -28,84 +29,129 @@ const useStyles = makeStyles({
 });
 
 interface RichTextEditorToolsProps {
+	/**
+	 * Текущий стейт редактора
+	 */
 	editorState: EditorState;
-	toggleBlockType: (blockType: string) => void;
-	toggleInlineStyle: (inlineStyle: string) => void;
-	openLinkPicker: () => void;
+	/**
+	 * Ф-я обновления текущего стейта
+	 */
+	setEditorState: (editorState: EditorState) => void;
+	/**
+	 * CSS-класс
+	 */
 	className?: string;
 }
 
-export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = ({
-	editorState,
-	toggleBlockType,
-	toggleInlineStyle,
-	openLinkPicker,
-	className,
-}: RichTextEditorToolsProps): JSX.Element => {
-	const classes = useStyles();
-	const onToggleControl = useCallback(
-		({ type, style }: ToolControl) => (
-			e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-		) => {
-			e.preventDefault();
+/**
+ * Панель инструментов расширенного редактора текстов
+ *
+ * @param {RichTextEditorToolsProps} props
+ * @returns {JSX.Element}
+ */
+export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = React.memo(
+	({
+		editorState,
+		setEditorState,
+		className,
+	}: RichTextEditorToolsProps): JSX.Element => {
+		const classes = useStyles();
 
-			switch (type) {
-				case "block":
-					toggleBlockType(style);
-					break;
-				case "inline":
-					toggleInlineStyle(style);
-					break;
-				case "link":
-					openLinkPicker();
-					break;
+		const [linkPicker, setLinkPicker] = useState<boolean>();
+
+		const openLinkPicker = useCallback(() => {
+			const selection = editorState.getSelection();
+			if (!selection.isEmpty() && !selection.isCollapsed()) {
+				setLinkPicker(true);
 			}
-		},
-		[toggleBlockType, toggleInlineStyle, openLinkPicker]
-	);
+		}, [editorState]);
 
-	const currentStyle = editorState.getCurrentInlineStyle();
-	const selection = editorState.getSelection();
-	const blockType = editorState
-		.getCurrentContent()
-		.getBlockForKey(selection.getStartKey())
-		.getType();
+		const closeLinkPicker = useCallback(() => setLinkPicker(false), []);
 
-	return (
-		<div className={clsx(classes.richEditorTools, className)}>
-			{richTextControls.map((control, i) => {
-				const IconComponent = control.icon && getIcon(control.icon);
-				const color =
-					(control.type === "inline" &&
-						currentStyle.has(control.style)) ||
-					(control.type === "block" && control.style === blockType)
-						? "primary"
-						: "default";
+		const onToggleControl = useCallback(
+			({ type, style }: ToolControl) => (
+				e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+			) => {
+				e.preventDefault();
 
-				return (
-					<Tooltip
-						placement="bottom"
-						title={control.tooltip || ""}
-						arrow={true}
-					>
-						<IconButton
-							key={i}
-							className={classes.btn}
-							size="small"
-							onMouseDown={onToggleControl(control)}
-							color={color}
-							disabled={control.disabled}
-						>
-							{IconComponent && <IconComponent />}
-							{control.text && (
-								<span className={classes.textIcon}>
-									{control.text}
-								</span>
-							)}
-						</IconButton>
-					</Tooltip>
-				);
-			})}
-		</div>
-	);
-};
+				switch (type) {
+					case "block":
+						if (style) {
+							setEditorState(
+								RichUtils.toggleBlockType(editorState, style)
+							);
+						}
+						break;
+					case "inline":
+						if (style) {
+							setEditorState(
+								RichUtils.toggleInlineStyle(editorState, style)
+							);
+						}
+						break;
+					case "link":
+						openLinkPicker();
+						break;
+				}
+			},
+			[editorState, openLinkPicker, setEditorState]
+		);
+
+		const currentStyle = editorState.getCurrentInlineStyle();
+		const selection = editorState.getSelection();
+		const blockType = editorState
+			.getCurrentContent()
+			.getBlockForKey(selection.getStartKey())
+			.getType();
+
+		return (
+			<>
+				<div className={clsx(classes.richEditorTools, className)}>
+					{richTextControls.map((control, i) => {
+						const IconComponent =
+							control.icon && getIcon(control.icon);
+						const color =
+							(control.style &&
+								control.type === "inline" &&
+								currentStyle.has(control.style)) ||
+							(control.type === "block" &&
+								control.style === blockType)
+								? "primary"
+								: "default";
+
+						return (
+							<Tooltip
+								key={i}
+								placement="bottom"
+								title={control.tooltip || ""}
+								arrow={true}
+							>
+								<IconButton
+									className={classes.btn}
+									size="small"
+									onMouseDown={onToggleControl(control)}
+									color={color}
+									disabled={control.disabled}
+								>
+									{IconComponent && <IconComponent />}
+									{control.text && (
+										<span className={classes.textIcon}>
+											{control.text}
+										</span>
+									)}
+								</IconButton>
+							</Tooltip>
+						);
+					})}
+				</div>
+				{linkPicker && (
+					<LinkPicker
+						editorState={editorState}
+						closeLinkPicker={closeLinkPicker}
+						setEditorState={setEditorState}
+					/>
+				)}
+			</>
+		);
+	}
+);

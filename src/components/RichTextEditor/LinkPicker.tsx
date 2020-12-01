@@ -1,14 +1,7 @@
-import { Fade, IconButton, makeStyles, TextField } from "@material-ui/core";
+import { Fade, IconButton, makeStyles } from "@material-ui/core";
 import clsx from "clsx";
 import { EditorState, RichUtils } from "draft-js";
-import React, {
-	ChangeEvent,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import React, { ChangeEvent, useCallback, useState } from "react";
 import { getIcon } from "../icons";
 
 const useStyles = makeStyles({
@@ -46,11 +39,26 @@ const CloseIcon = getIcon("Close")!;
 const CheckIcon = getIcon("Check")!;
 
 interface LinkPickerProps {
+	/**
+	 * Текущий стейт редактора текстов
+	 */
 	editorState: EditorState;
+	/**
+	 * Ф-я изменения стейта
+	 */
 	setEditorState: (editorState: EditorState) => void;
+	/**
+	 * Ф-я, закрывающая интерфейс редактирования ссылки
+	 */
 	closeLinkPicker: () => void;
 }
 
+/**
+ * Форма добавления ссылки в расширенном редакторе текстов
+ *
+ * @param {LinkPickerProps} props
+ * @returns {JSX.Element}
+ */
 export const LinkPicker: React.FC<LinkPickerProps> = ({
 	closeLinkPicker,
 	editorState,
@@ -58,32 +66,26 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 }) => {
 	const classes = useStyles();
 
+	let presetUrl = "";
+	const contentState = editorState.getCurrentContent();
+	const startKey = editorState.getSelection().getStartKey();
+	const startOffset = editorState.getSelection().getStartOffset();
+	const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
+	const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
+
+	if (linkKey) {
+		const linkInstance = contentState.getEntity(linkKey);
+		presetUrl = linkInstance.getData().url;
+	}
+
+	const [url, setUrl] = useState<string>(presetUrl);
 	const [error, setError] = useState<boolean>();
 
-	const selection = editorState.getSelection();
-
-	// let presetUrl = "";
-	// if (!selection.isCollapsed()) {
-	// 	const contentState = editorState.getCurrentContent();
-	// 	const startKey = editorState.getSelection().getStartKey();
-	// 	const startOffset = editorState.getSelection().getStartOffset();
-	// 	const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
-	// 	const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
-
-	// 	if (linkKey) {
-	// 		const linkInstance = contentState.getEntity(linkKey);
-	// 		presetUrl = linkInstance.getData().url;
-	// 	}
-	// }
-
-	const [url, setUrl] = useState<string>("");
-
 	const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		setUrl(e.target.value);
-
 		if (e.target.value) {
 			setError(false);
 		}
+		setUrl(e.target.value);
 	}, []);
 
 	const saveUrl = useCallback(
@@ -95,30 +97,27 @@ export const LinkPicker: React.FC<LinkPickerProps> = ({
 				return;
 			}
 
-			
+			const contentState = editorState.getCurrentContent();
+			const contentStateWithEntity = contentState.createEntity(
+				"LINK",
+				"MUTABLE",
+				{ url }
+			);
+			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+			const newEditorState = EditorState.set(editorState, {
+				currentContent: contentStateWithEntity,
+			});
 
-			// const contentState = editorState.getCurrentContent();
-			// const contentStateWithEntity = contentState.createEntity(
-			// 	"LINK",
-			// 	"MUTABLE",
-			// 	{ url }
-			// );
-			// const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-			// const newEditorState = EditorState.set(editorState, {
-			// 	currentContent: contentStateWithEntity,
-			// });
-
-			// setEditorState(
-			// 	RichUtils.toggleLink(
-			// 		newEditorState,
-			// 		newEditorState.getSelection(),
-			// 		entityKey
-			// 	)
-			// );
-			setUrl("");
+			setEditorState(
+				RichUtils.toggleLink(
+					newEditorState,
+					newEditorState.getSelection(),
+					entityKey
+				)
+			);
 			closeLinkPicker();
 		},
-		[editorState, setEditorState, closeLinkPicker, url]
+		[editorState, url]
 	);
 
 	return (

@@ -9,6 +9,7 @@ import SentimentVerySatisfied from "@material-ui/icons/SentimentVerySatisfied";
 import Close from "@material-ui/icons/Close";
 import Check from "@material-ui/icons/Check";
 import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
+import ExpandMore from "@material-ui/icons/ExpandMore";
 
 const icons: {
 	[key: string]: OverridableComponent<SvgIconTypeMap<{}, "svg">>;
@@ -22,6 +23,7 @@ const icons: {
 	Close,
 	Check,
 	FormatListNumberedIcon,
+	ExpandMore,
 };
 
 export const getIcon = (icon: string) => icons[icon];

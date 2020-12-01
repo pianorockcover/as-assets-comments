@@ -10,7 +10,7 @@ const useStyles = makeStyles({
 	appWrapper: {
 		margin: "0 auto",
 		maxWidth: 700,
-		height: "100vh",
+		minHeight: "100vh",
 		padding: 10,
 		background: "#f5f5f5",
 	},

@@ -1,24 +1,19 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React, {
 	createRef,
-	SyntheticEvent,
 	useCallback,
 	useEffect,
+	useRef,
 	useState,
 } from "react";
-import {
-	convertToRaw,
-	Editor,
-	EditorState,
-	Modifier,
-	RichUtils,
-} from "draft-js";
+import { Editor, EditorState } from "draft-js";
 import { RichTextEditorTools } from "./RichTextEditorTools";
-import { draftToMarkdown } from "markdown-draft-js";
 import clsx from "clsx";
-import { LinkPicker } from "./LinkPicker";
 import { richTextEditorDecorators } from "./decorators";
-import { convertToMarkdown } from "./convertToMarkdown";
+import {
+	convertMarkdownToDraft,
+	convertDraftToMarkdown,
+} from "./draftMarkdown";
 
 const border = "1px solid #d2d2d2";
 
@@ -58,140 +53,105 @@ const styleMap = {
 };
 
 interface RichTextEditorProps {
+	/**
+	 * Обработчик изменения текста
+	 */
 	onChange: (value: string) => void;
+	/**
+	 * Дефолтное значение
+	 */
+	defaultValue?: string;
+	/**
+	 * Редактор очищается при изменении этого свойства
+	 */
 	forceClean?: number;
+	/**
+	 * Подсказка
+	 */
+	placeholder?: string;
 }
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = ({
-	forceClean,
-	...props
-}: RichTextEditorProps): JSX.Element => {
-	const classes = useStyles();
+/**
+ * Расширенный редактор текста. Экспортирует строку в формате Markdown.
+ * - Фреймворк для создания редактора: [Draft.js](https://draftjs.org/)
+ * - Конвертер стейта Draft.js в Markdown: [markdown-draft-js](https://www.npmjs.com/package/markdown-draft-js)
+ *
+ * @param {RichTextEditorProps} props - св-ва компонента
+ * @returns {JSX.Element}
+ */
+export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
+	({
+		defaultValue,
+		forceClean,
+		placeholder,
+		...props
+	}: RichTextEditorProps): JSX.Element => {
+		const classes = useStyles();
 
-	const [editorState, setEditorState] = useState(
-		EditorState.createEmpty(richTextEditorDecorators)
-	);
+		const [editorState, setEditorState] = useState(
+			EditorState.createWithContent(
+				convertMarkdownToDraft(defaultValue),
+				richTextEditorDecorators
+			)
+		);
 
-	const [focus, setFocus] = useState<boolean>();
+		const onChange = useCallback(
+			(nextEditorState: EditorState) => setEditorState(nextEditorState),
+			[]
+		);
 
-	useEffect(() => {
-		if (forceClean) {
-			setEditorState(EditorState.createEmpty());
-		}
-	}, [forceClean]);
+		const ref = createRef<any>();
+		const [focus, setFocus] = useState<boolean>();
 
-	const ref = createRef<any>();
+		const onBlur = useCallback(() => setFocus(false), [editorState]);
 
-	const onBlur = useCallback(() => {
-		setFocus(false);
-	}, [editorState]);
+		const onClickArea = useCallback(() => {
+			if (ref && ref.current) {
+				ref.current.focus();
+				setFocus(true);
+			}
+		}, [ref]);
 
-	const onChange = useCallback(
-		(nextEditorState: EditorState) => setEditorState(nextEditorState),
-		[]
-	);
+		useEffect(() => {
+			if (forceClean) {
+				setEditorState(
+					EditorState.createEmpty(richTextEditorDecorators)
+				);
+			}
+		}, [forceClean]);
 
-	const toggleBlockType = useCallback(
-		(blockType: string) =>
-			setEditorState(RichUtils.toggleBlockType(editorState, blockType)),
-		[editorState]
-	);
+		useEffect(() => props.onChange(convertDraftToMarkdown(editorState)), [
+			editorState,
+		]);
 
-	const toggleInlineStyle = useCallback(
-		(inlineStyle: string) =>
-			setEditorState(
-				RichUtils.toggleInlineStyle(editorState, inlineStyle)
-			),
-		[editorState]
-	);
-
-	const onClickArea = useCallback(() => {
-		if (ref && ref.current) {
-			ref.current.focus();
-			setFocus(true);
-		}
-	}, [ref]);
-
-	const [linkPicker, setLinkPicker] = useState<boolean>();
-
-	const openLinkPicker = useCallback(() => {
-		const selection = editorState.getSelection();
-		if (!selection.isEmpty() && !selection.isCollapsed()) {
-			setLinkPicker(true);
-		}
-	}, [editorState]);
-
-	const closeLinkPicker = useCallback(() => {
-		setLinkPicker(false);
-	}, [editorState]);
-
-	const addLink = useCallback(
-		(e: any) => {
-			e.preventDefault();
-			const url = "text.com";
-
-			const contentState = editorState.getCurrentContent();
-			const contentStateWithEntity = contentState.createEntity(
-				"LINK",
-				"MUTABLE",
-				{ url }
-			);
-			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-			const newEditorState = EditorState.set(editorState, {
-				currentContent: contentStateWithEntity,
-			});
-
-			setEditorState(
-				RichUtils.toggleLink(
-					newEditorState,
-					newEditorState.getSelection(),
-					entityKey
-				)
-			);
-		},
-		[editorState]
-	);
-
-	useEffect(() => {
-		props.onChange(convertToMarkdown(editorState));
-	}, [props.onChange, editorState]);
-
-	return (
-		<div
-			className={clsx(classes.richEditorWrapper, {
-				[classes.richEditorWrapperFocus]: focus,
-			})}
-		>
-			<button onClick={addLink}>AddLink</button>
-			<RichTextEditorTools
-				editorState={editorState}
-				toggleBlockType={toggleBlockType}
-				toggleInlineStyle={toggleInlineStyle}
-				openLinkPicker={openLinkPicker}
-				className={!focus ? classes.toolsUnfocus : undefined}
-			/>
-			{linkPicker && (
-				<LinkPicker
-					editorState={editorState}
-					closeLinkPicker={closeLinkPicker}
-					setEditorState={setEditorState}
-				/>
-			)}
+		return (
 			<div
-				className={clsx(classes.richEditorArea, {
-					[classes.richEditorAreaFocus]: focus,
+				className={clsx(classes.richEditorWrapper, {
+					[classes.richEditorWrapperFocus]: focus,
 				})}
-				onClick={onClickArea}
 			>
-				<Editor
+				<RichTextEditorTools
 					editorState={editorState}
-					onChange={onChange}
-					spellCheck={true}
-					customStyleMap={styleMap}
-					onBlur={onBlur}
-					ref={ref}
+					setEditorState={setEditorState}
+					className={!focus ? classes.toolsUnfocus : undefined}
 				/>
+				<div
+					className={clsx(classes.richEditorArea, {
+						[classes.richEditorAreaFocus]: focus,
+					})}
+					onClick={onClickArea}
+				>
+					<Editor
+						editorState={editorState}
+						onChange={onChange}
+						spellCheck={true}
+						customStyleMap={styleMap}
+						onBlur={onBlur}
+						ref={ref}
+						placeholder={placeholder}
+					/>
+				</div>
 			</div>
-		</div>
-	);
-};
+		);
+	}
+);
