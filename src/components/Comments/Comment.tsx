@@ -1,4 +1,4 @@
-import { IconButton, Zoom } from "@material-ui/core";
+import { Fade, IconButton } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import React, {
@@ -17,6 +17,9 @@ const useStyles = makeStyles({
 		background: "#e8e8e8",
 		padding: 10,
 		borderRadius: 5,
+		"&:nth-last-child(1)": {
+			marginBottom: 0,
+		},
 	},
 	author: {
 		fontWeight: 500,
@@ -28,6 +31,9 @@ const useStyles = makeStyles({
 	text: {
 		overflow: "hidden",
 		position: "relative",
+		"& p": {
+			marginTop: 0,
+		},
 	},
 	textHidden: {
 		"&:after": {
@@ -46,12 +52,14 @@ const useStyles = makeStyles({
 		position: "absolute",
 		marginLeft: "calc(50% - 15px)",
 		zIndex: 2,
-		transition: "transform .3s linear",
+		transition: "transform .3s ease-in-out, background .2s linear",
 		color: "#252733",
+		background: "rgb(16, 16, 16, 0.1)",
 	},
 	readMoreButtonClose: {
 		transform: "rotate(180deg)",
 		position: "static",
+		background: "transparent",
 	},
 });
 
@@ -76,21 +84,13 @@ export interface CommentProps {
 	 */
 	date: string;
 	/**
-	 * Индекс в списке комментариев
+	 * Индекс во внешнем массиве комментариев
 	 */
 	index?: number;
 	/**
-	 * Если true - комментарий будет анимирован
+	 * Анимировать коммент, если он первый в списке
 	 */
-	showLastComment?: boolean;
-	/**
-	 * Если True - комментарий будет показан без анимации
-	 */
-	visible?: boolean;
-	/**
-	 * Длительность анимации
-	 */
-	animationTimeout?: number;
+	firstAnimated?: boolean;
 }
 
 /**
@@ -101,7 +101,7 @@ export interface CommentProps {
  * @returns {JSX.Element}
  */
 export const SingleComment: React.FC<CommentProps> = React.memo(
-	({ author, date, text, ...props }: CommentProps) => {
+	({ author, date, text, index, firstAnimated }: CommentProps) => {
 		const classes = useStyles();
 
 		const ref = createRef<HTMLDivElement>();
@@ -119,39 +119,46 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 					setNeedReadMoreButton(true);
 				}
 			}
-		}, [ref, hidden]);
+		}, []);
 
 		const toggleHidden = useCallback(() => setHidden(!hidden), [hidden]);
 
-		const height = useMemo(() => (hidden ? maxHeight : undefined), [
-			hidden,
-		]);
+		const height = useMemo(() => {
+			return hidden ? maxHeight : undefined;
+		}, [hidden]);
+
+		const animationTimeout = useMemo(
+			() => (firstAnimated && index === 0 ? 500 : 0),
+			[index, firstAnimated]
+		);
 
 		return (
-			<div className={classes.comment}>
-				<div className={classes.author}>{author}</div>
-				<div className={classes.date}>{date}</div>
-				<div
-					className={clsx(classes.text, {
-						[classes.textHidden]: hidden,
-					})}
-					ref={ref}
-					style={{ maxHeight: height }}
-				>
-					<ReactMarkdown>{text}</ReactMarkdown>
-					{needReadMoreButton && (
-						<IconButton
-							size="small"
-							className={clsx(classes.readMoreButton, {
-								[classes.readMoreButtonClose]: !hidden,
-							})}
-							onClick={toggleHidden}
-						>
-							{ArrowIcon && <ArrowIcon />}
-						</IconButton>
-					)}
+			<Fade in={true} timeout={animationTimeout}>
+				<div className={classes.comment}>
+					<div className={classes.author}>{author}</div>
+					<div className={classes.date}>{date}</div>
+					<div
+						className={clsx(classes.text, {
+							[classes.textHidden]: hidden,
+						})}
+						ref={ref}
+						style={{ maxHeight: height }}
+					>
+						<ReactMarkdown>{text}</ReactMarkdown>
+						{needReadMoreButton && (
+							<IconButton
+								size="small"
+								className={clsx(classes.readMoreButton, {
+									[classes.readMoreButtonClose]: !hidden,
+								})}
+								onClick={toggleHidden}
+							>
+								{ArrowIcon && <ArrowIcon />}
+							</IconButton>
+						)}
+					</div>
 				</div>
-			</div>
+			</Fade>
 		);
 	}
 );

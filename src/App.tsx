@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import React, { useCallback, useState } from "react";
 import { RichTextEditor } from "./components/RichTextEditor/RichTextEditor";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,15 +14,54 @@ const useStyles = makeStyles({
 		padding: 10,
 		background: "#f5f5f5",
 	},
-
 	"@global": {
 		"*::-webkit-scrollbar": {
 			width: 10,
 		},
 		"*::-webkit-scrollbar-thumb": {
-			backgroundColor: "rgba(0,0,0,.1)",
+			backgroundColor: "rgba(0, 0, 0, .3)",
 			borderRadius: 5,
 		},
+		"*::-webkit-scrollbar-track": {
+			backgroundColor: "rgba(0, 0, 0, .1)",
+			borderRadius: 5,
+		},
+	},
+	"body": {
+		minWidth: 1000,
+	},
+	leaveCommentBtn: {
+		marginBottom: 20,
+	},
+	badge: {
+		background: "#78a971",
+		color: "#ffffff",
+		maxWidth: 250,
+		textAlign: "center",
+		borderRadius: 5,
+		padding: 3,
+		margin: "0 auto",
+		marginBottom: 30,
+	},
+	title: {
+		fontSize: 17,
+		textAlign: "center",
+		marginBottom: 10,
+		marginTop: 15,
+		fontWeight: 500,
+	},
+	decisionBtn: {
+		background: "#78a971",
+		color: "#ffffff",
+		paddingLeft: 50,
+		paddingRight: 50,
+		margin: "0 auto",
+		display: "block",
+		marginTop: 10,
+		marginBottom: 20,
+		"&:hover": {
+			background: "#78a971",
+		}
 	},
 });
 
@@ -52,19 +91,31 @@ function App() {
 
 	return (
 		<div className={classes.appWrapper}>
+			<Typography variant="h3" className={classes.title}>
+				Основание для принятия решения по активу 201212000932
+			</Typography>
+			<div className={classes.badge}>Актив в пуле</div>
 			<RichTextEditor
 				onChange={setCurrentComment}
 				forceClean={forceClean}
 			/>
 			<Button
 				variant="contained"
-				color="primary"
 				size="small"
+				color="primary"
 				onClick={leaveComment}
+				className={classes.leaveCommentBtn}
 			>
 				Оставить комментарий
 			</Button>
 			<Comments data={comments} />
+			<Button
+				variant="contained"
+				size="small"
+				className={classes.decisionBtn}
+			>
+				Принять решение по активу
+			</Button>
 		</div>
 	);
 }

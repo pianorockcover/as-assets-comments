@@ -30,7 +30,7 @@ const useStyles = makeStyles({
 	},
 	richEditorArea: {
 		padding: 10,
-		height: 200,
+		height: 150,
 		overflowY: "auto",
 		transition: "box-shadow .2s ease-in-out",
 	},
