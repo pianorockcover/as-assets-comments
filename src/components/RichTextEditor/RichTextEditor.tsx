@@ -24,13 +24,15 @@ const useStyles = makeStyles({
 		marginBottom: 20,
 		position: "relative",
 		transition: "border .2s ease-in-out",
+		paddingBottom: 22,
+		minWidth: 450,
 	},
 	richEditorWrapperFocus: {
 		borderColor: "#4dd0e1",
 	},
 	richEditorArea: {
 		padding: 10,
-		height: 150,
+		height: 200,
 		overflowY: "auto",
 		transition: "box-shadow .2s ease-in-out",
 	},
@@ -40,6 +42,19 @@ const useStyles = makeStyles({
 	toolsUnfocus: {
 		opacity: 0.95,
 		transition: "opacity .2s ease-in-out",
+	},
+	amountBar: {
+		position: "absolute",
+		bottom: 0,
+		left: 0,
+		width: "100%",
+		textAlign: "right",
+		fontSize: 11,
+		background: "#eeeeee",
+		borderTop: "1px solid #d2d2d2",
+		padding: 3,
+		zIndex: 1,
+		color: "#4c4b4b",
 	},
 });
 
@@ -69,6 +84,10 @@ interface RichTextEditorProps {
 	 * Подсказка
 	 */
 	placeholder?: string;
+	/**
+	 * CSS-класс
+	 */
+	className?: string;
 }
 
 /**
@@ -84,6 +103,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 		defaultValue,
 		forceClean,
 		placeholder,
+		className,
 		...props
 	}: RichTextEditorProps): JSX.Element => {
 		const classes = useStyles();
@@ -94,6 +114,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 				richTextEditorDecorators
 			)
 		);
+
+		const [symbolsAmount, setSymbolsAmount] = useState<number>(0);
 
 		const onChange = useCallback(
 			(nextEditorState: EditorState) => setEditorState(nextEditorState),
@@ -120,15 +142,21 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 			}
 		}, [forceClean]);
 
-		useEffect(() => props.onChange(convertDraftToMarkdown(editorState)), [
-			editorState,
-		]);
+		useEffect(() => {
+			const markdownString = convertDraftToMarkdown(editorState);
+			props.onChange(markdownString);
+			setSymbolsAmount(markdownString.length);
+		}, [editorState]);
 
 		return (
 			<div
-				className={clsx(classes.richEditorWrapper, {
-					[classes.richEditorWrapperFocus]: focus,
-				})}
+				className={clsx(
+					classes.richEditorWrapper,
+					{
+						[classes.richEditorWrapperFocus]: focus,
+					},
+					className
+				)}
 			>
 				<RichTextEditorTools
 					editorState={editorState}
@@ -151,6 +179,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 						placeholder={placeholder}
 					/>
 				</div>
+				<span className={classes.amountBar}>
+					Всего симолов: {symbolsAmount}
+				</span>
 			</div>
 		);
 	}

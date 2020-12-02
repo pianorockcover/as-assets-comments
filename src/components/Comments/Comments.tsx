@@ -1,5 +1,6 @@
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CommentProps, SingleComment } from "./Comment";
 import { generateComment } from "./generateComment";
@@ -10,10 +11,12 @@ const useStyles = makeStyles({
 	},
 	comments: {
 		marginBottom: 10,
-		paddingRight: 5,
 		maxHeight: 700,
 		overflowY: "auto",
 		overflowX: "hidden",
+		paddingTop: 10,
+		paddingRight: 20,
+		paddingBottom: 15,
 	},
 });
 
@@ -35,6 +38,10 @@ interface CommentsProps {
 	 * В проекте комментарии будут запрашиваться самим комопонентом с сервера.
 	 */
 	data: CommentProps[];
+	/**
+	 * CSS-класс
+	 */
+	className?: string;
 }
 
 /**
@@ -43,90 +50,92 @@ interface CommentsProps {
  * @param {CommentsProps} props
  * @returns {JSX.Element}
  */
-export const Comments: React.FC<CommentsProps> = React.memo(({ data }) => {
-	const classes = useStyles();
+export const Comments: React.FC<CommentsProps> = React.memo(
+	({ data, className }) => {
+		const classes = useStyles();
 
-	const [commentsList, setCommentsList] = useState<CommentsList>({
-		rows: data,
-		totalCount: tmpTotalCount,
-	});
-
-	const [animated, setAnimated] = useState<boolean>(false);
-
-	useEffect(() => {
-		setCommentsList({
+		const [commentsList, setCommentsList] = useState<CommentsList>({
 			rows: data,
 			totalCount: tmpTotalCount,
 		});
-		setAnimated(true);
-	}, [data]);
 
-	const showMoreDisabled = useMemo(
-		() => commentsList.rows.length >= commentsList.totalCount,
-		[commentsList]
-	);
+		const [animated, setAnimated] = useState<boolean>(false);
 
-	const onShowMore = useCallback(() => {
-		// TODO: временно, заглушка! Здесь запрос на сервер!
-		const toAdd: CommentProps[] = new Array(paginationSize)
-			.fill(null)
-			.map(generateComment);
+		useEffect(() => {
+			setCommentsList({
+				rows: data,
+				totalCount: tmpTotalCount,
+			});
+			setAnimated(true);
+		}, [data]);
 
-		setCommentsList({
-			rows: [...commentsList.rows, ...toAdd],
-			totalCount: tmpTotalCount,
-		});
-		setAnimated(false);
-	}, [commentsList]);
+		const showMoreDisabled = useMemo(
+			() => commentsList.rows.length >= commentsList.totalCount,
+			[commentsList]
+		);
 
-	const showLessDisabled = useMemo(
-		() => commentsList.rows.length <= paginationSize,
-		[commentsList]
-	);
+		const onShowMore = useCallback(() => {
+			// TODO: временно, заглушка! Здесь запрос на сервер!
+			const toAdd: CommentProps[] = new Array(paginationSize)
+				.fill(null)
+				.map(generateComment);
 
-	const onShowLess = useCallback(() => {
-		// TODO: временно, заглушка!
-		setCommentsList({
-			rows: commentsList.rows.slice(0, -paginationSize),
-			totalCount: tmpTotalCount,
-		});
-		setAnimated(false);
-	}, [commentsList]);
+			setCommentsList({
+				rows: [...commentsList.rows, ...toAdd],
+				totalCount: tmpTotalCount,
+			});
+			setAnimated(false);
+		}, [commentsList]);
 
-	return (
-		<div className={classes.commentsWrapper}>
-			<div className={classes.comments}>
-				<React.Fragment>
-					{commentsList.rows.map((comment, i) => (
-						<SingleComment
-							{...comment}
-							// Чтобы обеспечить правильную перерисовку комментария
-							// при добавлении нового элемента в стек
-							key={`${i}-${+new Date()}`}
-							index={i}
-							firstAnimated={animated}
-						/>
-					))}
-				</React.Fragment>
+		const showLessDisabled = useMemo(
+			() => commentsList.rows.length <= paginationSize,
+			[commentsList]
+		);
+
+		const onShowLess = useCallback(() => {
+			// TODO: временно, заглушка!
+			setCommentsList({
+				rows: commentsList.rows.slice(0, -paginationSize),
+				totalCount: tmpTotalCount,
+			});
+			setAnimated(false);
+		}, [commentsList]);
+
+		return (
+			<div className={clsx(classes.commentsWrapper, className)}>
+				<div className={classes.comments}>
+					<React.Fragment>
+						{commentsList.rows.map((comment, i) => (
+							<SingleComment
+								{...comment}
+								// Чтобы обеспечить правильную перерисовку комментария
+								// при добавлении нового элемента в стек
+								key={`${i}-${+new Date()}`}
+								index={i}
+								firstAnimated={animated}
+							/>
+						))}
+					</React.Fragment>
+				</div>
+				{commentsList.totalCount && (
+					<>
+						<Button
+							color="primary"
+							onClick={onShowMore}
+							disabled={showMoreDisabled}
+						>
+							+ Показать больше
+						</Button>
+						<Button
+							color="primary"
+							onClick={onShowLess}
+							disabled={showLessDisabled}
+						>
+							- Скрыть
+						</Button>
+					</>
+				)}
 			</div>
-			{commentsList.totalCount && (
-				<>
-					<Button
-						color="primary"
-						onClick={onShowMore}
-						disabled={showMoreDisabled}
-					>
-						+ Показать больше
-					</Button>
-					<Button
-						color="primary"
-						onClick={onShowLess}
-						disabled={showLessDisabled}
-					>
-						- Скрыть
-					</Button>
-				</>
-			)}
-		</div>
-	);
-});
+		);
+	}
+);

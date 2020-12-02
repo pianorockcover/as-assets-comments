@@ -9,10 +9,12 @@ import fakeApiComments from "./fake-api.json";
 const useStyles = makeStyles({
 	appWrapper: {
 		margin: "0 auto",
-		maxWidth: 700,
+		maxWidth: 800,
 		minHeight: "100vh",
 		padding: 10,
-		background: "#f5f5f5",
+		paddingLeft: 30,
+		paddingRight: 30,
+		background: "#eef2f4",
 	},
 	"@global": {
 		"*::-webkit-scrollbar": {
@@ -24,11 +26,11 @@ const useStyles = makeStyles({
 		},
 		"*::-webkit-scrollbar-track": {
 			backgroundColor: "rgba(0, 0, 0, .1)",
-			borderRadius: 5,
 		},
 	},
 	"body": {
 		minWidth: 1000,
+		backgroundColor: "#eef2f4",
 	},
 	leaveCommentBtn: {
 		marginBottom: 20,
