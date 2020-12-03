@@ -42,6 +42,10 @@ interface CommentsProps {
 	 * CSS-класс
 	 */
 	className?: string;
+	/**
+	 * Id текущего пользователя
+	 */
+	selfUserId?: number;
 }
 
 /**
@@ -51,7 +55,7 @@ interface CommentsProps {
  * @returns {JSX.Element}
  */
 export const Comments: React.FC<CommentsProps> = React.memo(
-	({ data, className }) => {
+	({ data, className, selfUserId }) => {
 		const classes = useStyles();
 
 		const [commentsList, setCommentsList] = useState<CommentsList>({
@@ -113,6 +117,7 @@ export const Comments: React.FC<CommentsProps> = React.memo(
 								key={`${i}-${+new Date()}`}
 								index={i}
 								firstAnimated={animated}
+								selfUserId={selfUserId}
 							/>
 						))}
 					</React.Fragment>

@@ -28,7 +28,7 @@ const useStyles = makeStyles({
 			backgroundColor: "rgba(0, 0, 0, .1)",
 		},
 	},
-	"body": {
+	body: {
 		minWidth: 1000,
 		backgroundColor: "#eef2f4",
 	},
@@ -63,7 +63,7 @@ const useStyles = makeStyles({
 		marginBottom: 20,
 		"&:hover": {
 			background: "#78a971",
-		}
+		},
 	},
 });
 
@@ -81,6 +81,12 @@ function App() {
 					author: "Тест Тестов",
 					date: "23.09.2020 20:31",
 					text: currentComment,
+					user: {
+						id: 2,
+					},
+					decision: {
+						label: "Решение не принято",
+					},
 				},
 				...comments,
 			]);
@@ -110,7 +116,7 @@ function App() {
 			>
 				Оставить комментарий
 			</Button>
-			<Comments data={comments} />
+			<Comments data={comments} selfUserId={2} />
 			<Button
 				variant="contained"
 				size="small"

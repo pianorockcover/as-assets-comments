@@ -24,5 +24,11 @@ export const generateComment = (): CommentProps => {
 		)}`,
 		date: `12.02.2020 20:43`,
 		text: lorem.generateSentences(5),
+		user: {
+			id: 1,
+		},
+		decision: {
+			label: "Решение не принято"
+		}
 	};
 };

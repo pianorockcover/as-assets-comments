@@ -14,12 +14,34 @@ import { getCommentAvatarData } from "./getCommentAvatar";
 
 const useStyles = makeStyles({
 	comment: {
-		marginBottom: 10,
+		marginBottom: 25,
 		"&:nth-last-child(1)": {
 			marginBottom: 0,
 		},
 		position: "relative",
 		paddingLeft: 60,
+
+		"&:before": {
+			content: "''",
+			display: "block",
+			position: "absolute",
+			width: "calc(100% - 60px)",
+			height: 1,
+			background: "#d4d4d4",
+			top: 10,
+			zIndex: 1,
+		},
+
+		"&:after": {
+			content: "''",
+			position: "absolute",
+			width: 5,
+			height: 5,
+			background: "#d4d4d4",
+			top: 8,
+			left: 60,
+			right: "auto",
+		},
 	},
 	commentArea: {
 		padding: 10,
@@ -82,8 +104,47 @@ const useStyles = makeStyles({
 		display: "flex",
 		alignItems: "center",
 		justifyContent: "center",
-		fontSize: 24,
-		fontWeight: 500,
+		fontSize: 20,
+		fontWeight: 400,
+	},
+	avatarSelf: {
+		border: "3px solid #ffffff",
+
+		"&:after": {
+			content: "''",
+			width: 14,
+			height: 14,
+			display: "block",
+			position: "absolute",
+			bottom: -4,
+			right: 0,
+			borderRadius: "100%",
+			background: "#03A9F4",
+			border: "2px solid #ffffff",
+		},
+	},
+	decision: {
+		color: "#636e72",
+		width: "fit-content",
+		padding: 3,
+		fontSize: 11,
+		marginLeft: 20,
+		marginBottom: 8,
+		borderRadius: 5,
+		paddingLeft: 10,
+		paddingRight: 10,
+		position: "relative",
+		zIndex: 2,
+		background: "#eef2f4",
+		border: "1px solid",
+	},
+	decisionSuccess: {
+		color: "#8BC34A",
+		border: "1px solid",
+	},
+	decisionError: {
+		color: "#f44336",
+		border: "1px solid",
 	},
 });
 
@@ -115,6 +176,23 @@ export interface CommentProps {
 	 * Анимировать коммент, если он первый в списке
 	 */
 	firstAnimated?: boolean;
+	/**
+	 * Решение
+	 */
+	decision?: {
+		success?: boolean;
+		label: string;
+	};
+	/**
+	 * Id текущего пользователя
+	 */
+	selfUserId?: number;
+	/**
+	 * Пользователь, оставивший коммент
+	 */
+	user: {
+		id: number;
+	};
 }
 
 /**
@@ -125,7 +203,16 @@ export interface CommentProps {
  * @returns {JSX.Element}
  */
 export const SingleComment: React.FC<CommentProps> = React.memo(
-	({ author, date, text, index, firstAnimated }: CommentProps) => {
+	({
+		author,
+		date,
+		text,
+		index,
+		firstAnimated,
+		decision,
+		selfUserId,
+		user,
+	}: CommentProps) => {
 		const classes = useStyles();
 
 		const ref = createRef<HTMLDivElement>();
@@ -160,9 +247,23 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 
 		return (
 			<Fade in={true} timeout={animationTimeout}>
-				<div className={classes.comment}>
+				<div className={clsx(classes.comment)}>
+					{decision && (
+						<div
+							className={clsx(classes.decision, {
+								[classes.decisionSuccess]:
+									decision && decision.success,
+								[classes.decisionError]:
+									decision && decision.success === false,
+							})}
+						>
+							{decision.label}
+						</div>
+					)}
 					<div
-						className={classes.avatar}
+						className={clsx(classes.avatar, {
+							[classes.avatarSelf]: selfUserId === user.id,
+						})}
 						style={{ backgroundColor: avatar.color }}
 					>
 						{avatar.symbol}
