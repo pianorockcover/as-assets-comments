@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 		marginBottom: 20,
 	},
 	badge: {
-		background: "#78a971",
+		background: "#FF9800",
 		color: "#ffffff",
 		maxWidth: 250,
 		textAlign: "center",
@@ -107,20 +107,12 @@ function App() {
 				onChange={setCurrentComment}
 				forceClean={forceClean}
 			/>
-			<Button
-				variant="contained"
-				size="small"
-				color="primary"
-				onClick={leaveComment}
-				className={classes.leaveCommentBtn}
-			>
-				Оставить комментарий
-			</Button>
 			<Comments data={comments} selfUserId={2} />
 			<Button
 				variant="contained"
 				size="small"
 				className={classes.decisionBtn}
+				onClick={leaveComment}
 			>
 				Принять решение по активу
 			</Button>

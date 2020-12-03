@@ -3,7 +3,7 @@ import React, {
 	createRef,
 	useCallback,
 	useEffect,
-	useRef,
+	useMemo,
 	useState,
 } from "react";
 import { Editor, EditorState } from "draft-js";
@@ -56,6 +56,9 @@ const useStyles = makeStyles({
 		zIndex: 1,
 		color: "#4c4b4b",
 	},
+	amountBarError: {
+		color: "#ee1d1d",
+	},
 });
 
 const styleMap = {
@@ -66,6 +69,8 @@ const styleMap = {
 		color: "#0088bb",
 	},
 };
+
+const defaultMax = 1000;
 
 interface RichTextEditorProps {
 	/**
@@ -88,6 +93,10 @@ interface RichTextEditorProps {
 	 * CSS-класс
 	 */
 	className?: string;
+	/**
+	 * Макс. количество символов
+	 */
+	max?: number;
 }
 
 /**
@@ -115,7 +124,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 			)
 		);
 
-		const [symbolsAmount, setSymbolsAmount] = useState<number>(0);
+		const max = useMemo(() => props.max || defaultMax, [props.max]);
+
+		const [symbolsLeft, setSymbolsLeft] = useState<number>(max);
 
 		const onChange = useCallback(
 			(nextEditorState: EditorState) => setEditorState(nextEditorState),
@@ -145,7 +156,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 		useEffect(() => {
 			const markdownString = convertDraftToMarkdown(editorState);
 			props.onChange(markdownString);
-			setSymbolsAmount(markdownString.length);
+			setSymbolsLeft(max - markdownString.length);
 		}, [editorState]);
 
 		return (
@@ -179,8 +190,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 						placeholder={placeholder}
 					/>
 				</div>
-				<span className={classes.amountBar}>
-					Всего симолов: {symbolsAmount}
+				<span
+					className={clsx(classes.amountBar, {
+						[classes.amountBarError]: symbolsLeft <= 0,
+					})}
+				>
+					Осталось симолов: {symbolsLeft}
 				</span>
 			</div>
 		);
