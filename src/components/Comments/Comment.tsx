@@ -161,10 +161,6 @@ export interface CommentProps {
 	 */
 	text: string;
 	/**
-	 * Автор
-	 */
-	author: string;
-	/**
 	 * Дата
 	 */
 	date: string;
@@ -180,7 +176,13 @@ export interface CommentProps {
 	 * Решение
 	 */
 	decision?: {
+		/**
+		 * Успех/неуспех
+		 */
 		success?: boolean;
+		/**
+		 * Текст решения
+		 */
 		label: string;
 	};
 	/**
@@ -191,7 +193,14 @@ export interface CommentProps {
 	 * Пользователь, оставивший коммент
 	 */
 	user: {
+		/**
+		 * Id
+		 */
 		id: number;
+		/**
+		 * Имя
+		 */
+		name: string;
 	};
 }
 
@@ -204,7 +213,6 @@ export interface CommentProps {
  */
 export const SingleComment: React.FC<CommentProps> = React.memo(
 	({
-		author,
 		date,
 		text,
 		index,
@@ -243,7 +251,9 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 			[index, firstAnimated]
 		);
 
-		const avatar = useMemo(() => getCommentAvatarData(author), [author]);
+		const avatar = useMemo(() => getCommentAvatarData(user.name), [
+			user.name,
+		]);
 
 		return (
 			<Fade in={true} timeout={animationTimeout}>
@@ -269,7 +279,7 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 						{avatar.symbol}
 					</div>
 					<div className={classes.commentArea}>
-						<div className={classes.author}>{author}</div>
+						<div className={classes.author}>{user.name}</div>
 						<div className={classes.date}>{date}</div>
 						<div
 							className={clsx(classes.text, {

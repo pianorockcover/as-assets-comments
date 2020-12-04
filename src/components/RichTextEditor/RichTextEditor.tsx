@@ -25,7 +25,6 @@ const useStyles = makeStyles({
 		position: "relative",
 		transition: "border .2s ease-in-out",
 		paddingBottom: 22,
-		minWidth: 450,
 	},
 	richEditorWrapperFocus: {
 		borderColor: "#4dd0e1",

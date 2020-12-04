@@ -12,13 +12,14 @@ const useStyles = makeStyles({
 		maxWidth: 800,
 		minHeight: "100vh",
 		padding: 10,
-		paddingLeft: 30,
-		paddingRight: 30,
+		paddingLeft: 20,
+		paddingRight: 20,
 		background: "#eef2f4",
 	},
 	"@global": {
 		"*::-webkit-scrollbar": {
 			width: 10,
+			height: 10,
 		},
 		"*::-webkit-scrollbar-thumb": {
 			backgroundColor: "rgba(0, 0, 0, .3)",
@@ -78,11 +79,11 @@ function App() {
 		if (currentComment) {
 			setComments([
 				{
-					author: "Тест Тестов",
 					date: "23.09.2020 20:31",
 					text: currentComment,
 					user: {
 						id: 2,
+						name: "Тест Тестов"
 					},
 					decision: {
 						label: "Решение не принято",

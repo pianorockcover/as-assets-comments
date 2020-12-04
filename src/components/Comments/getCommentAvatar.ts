@@ -56,8 +56,8 @@ interface AvatarData {
  * @param {string} author - имя автора комментария
  */
 export const getCommentAvatarData = (author: string): AvatarData => {
-	const firstSymbol = author.slice(0, 1).toLocaleUpperCase();
-	const symbol = `${firstSymbol}${author.slice(0, 1).toLocaleUpperCase()}`;
+	const firstSymbol = author.split(" ")[0].slice(0, 1).toLocaleUpperCase();
+	const symbol = `${firstSymbol}${author.split(" ")[1].slice(0, 1).toLocaleUpperCase()}`;
 	const color = colors.find(({ symbols }) => symbols.includes(firstSymbol));
 
 	return {

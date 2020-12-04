@@ -16,19 +16,19 @@ export const generateComment = (): CommentProps => {
 			max: 6,
 			min: 4,
 		},
-    });
-    
+	});
+
 	return {
-		author: `${capitalize(lorem.generateWords(1))} ${capitalize(
-			lorem.generateWords(1)
-		)}`,
 		date: `12.02.2020 20:43`,
 		text: lorem.generateSentences(5),
 		user: {
 			id: 1,
+			name: `${capitalize(lorem.generateWords(1))} ${capitalize(
+				lorem.generateWords(1)
+			)}`,
 		},
 		decision: {
-			label: "Решение не принято"
-		}
+			label: "Решение не принято",
+		},
 	};
 };

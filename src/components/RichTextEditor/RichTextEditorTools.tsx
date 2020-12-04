@@ -10,6 +10,10 @@ import { LinkPicker } from "./LinkPicker";
 const useStyles = makeStyles({
 	richEditorTools: {
 		borderBottom: "1px solid #d2d2d2",
+		width: "100%",
+		display: "flex",
+		maxWidth: "100%",
+		overflow: "auto",
 	},
 	btn: {
 		padding: 4,
