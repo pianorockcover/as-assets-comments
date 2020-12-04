@@ -108,7 +108,6 @@ function App() {
 				onChange={setCurrentComment}
 				forceClean={forceClean}
 			/>
-			<Comments data={comments} selfUserId={2} />
 			<Button
 				variant="contained"
 				size="small"
@@ -117,6 +116,7 @@ function App() {
 			>
 				Принять решение по активу
 			</Button>
+			<Comments data={comments} selfUserId={2} />
 		</div>
 	);
 }
