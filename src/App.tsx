@@ -61,7 +61,7 @@ const useStyles = makeStyles({
 		margin: "0 auto",
 		display: "block",
 		marginTop: 10,
-		marginBottom: 20,
+		marginBottom: 40,
 		"&:hover": {
 			background: "#78a971",
 		},
