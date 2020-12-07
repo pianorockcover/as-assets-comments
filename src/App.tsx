@@ -5,17 +5,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import { CommentProps } from "./components/Comments/Comment";
 import { Comments } from "./components/Comments/Comments";
 import fakeApiComments from "./fake-api.json";
+import { CardLayout } from "./components/CardLayout/CardLayout";
 
 const useStyles = makeStyles({
-	appWrapper: {
-		margin: "0 auto",
-		maxWidth: 800,
-		minHeight: "100vh",
-		padding: 10,
-		paddingLeft: 20,
-		paddingRight: 20,
-		background: "#eef2f4",
-	},
 	"@global": {
 		"*::-webkit-scrollbar": {
 			width: 10,
@@ -83,7 +75,7 @@ function App() {
 					text: currentComment,
 					user: {
 						id: 2,
-						name: "Тест Тестов"
+						name: "Тест Тестов",
 					},
 					decision: {
 						label: "Решение не принято",
@@ -99,7 +91,7 @@ function App() {
 	}, [currentComment, comments]);
 
 	return (
-		<div className={classes.appWrapper}>
+		<CardLayout>
 			<Typography variant="h3" className={classes.title}>
 				Основание для принятия решения по активу 201212000932
 			</Typography>
@@ -117,7 +109,7 @@ function App() {
 				Принять решение по активу
 			</Button>
 			<Comments data={comments} selfUserId={2} />
-		</div>
+		</CardLayout>
 	);
 }
 

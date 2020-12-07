@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import ReactMarkdown from "react-markdown";
 import { getIcon } from "../icons";
+import { decorateStickers } from "./decorateStickers";
 import { getCommentAvatarData } from "./getCommentAvatar";
 
 const useStyles = makeStyles({
@@ -153,7 +154,7 @@ const ArrowIcon = getIcon("ExpandMore");
 /**
  * Максимальная высота блока с текстом комментария
  */
-const maxHeight = 100;
+const maxHeight = 120;
 
 export interface CommentProps {
 	/**
@@ -255,6 +256,9 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 			user.name,
 		]);
 
+        // ***TODO: Just for fun! Remove in production!***
+		const decoratedText = useMemo(() => decorateStickers(text), [text]);
+
 		return (
 			<Fade in={true} timeout={animationTimeout}>
 				<div className={clsx(classes.comment)}>
@@ -288,7 +292,9 @@ export const SingleComment: React.FC<CommentProps> = React.memo(
 							ref={ref}
 							style={{ maxHeight: height }}
 						>
-							<ReactMarkdown>{text}</ReactMarkdown>
+							<ReactMarkdown escapeHtml={false}>
+								{decoratedText}
+							</ReactMarkdown>
 							{needReadMoreButton && (
 								<IconButton
 									size="small"

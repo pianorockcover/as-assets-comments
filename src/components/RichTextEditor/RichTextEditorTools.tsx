@@ -6,6 +6,7 @@ import { EditorState, RichUtils } from "draft-js";
 import clsx from "clsx";
 import { richTextControls, ToolControl } from "./toolControls";
 import { LinkPicker } from "./LinkPicker";
+import { StickerPicker } from "./StickerPicker";
 
 const useStyles = makeStyles({
 	richEditorTools: {
@@ -72,6 +73,13 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = React.mem
 
 		const closeLinkPicker = useCallback(() => setLinkPicker(false), []);
 
+		const [stickerPicker, setStickerPicker] = useState<boolean>();
+
+		const closeStickerPicker = useCallback(
+			() => setStickerPicker(false),
+			[]
+		);
+
 		const onToggleControl = useCallback(
 			({ type, style }: ToolControl) => (
 				e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -95,6 +103,10 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = React.mem
 						break;
 					case "link":
 						openLinkPicker();
+						break;
+
+					case "sticker":
+						setStickerPicker(true);
 						break;
 				}
 			},
@@ -152,6 +164,14 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = React.mem
 					<LinkPicker
 						editorState={editorState}
 						closeLinkPicker={closeLinkPicker}
+						setEditorState={setEditorState}
+					/>
+				)}
+                {/* ***TODO: Just for fun! Remove in production!*** */}
+				{stickerPicker && (
+					<StickerPicker
+						editorState={editorState}
+						closeStickerPicker={closeStickerPicker}
 						setEditorState={setEditorState}
 					/>
 				)}

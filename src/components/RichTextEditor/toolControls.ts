@@ -7,8 +7,9 @@ export interface ToolControl {
 	 * - inline - включить стиль (например: курсив, жирный)
 	 * - block - добавить стилизованный блок (напримр: заголовок, список)
 	 * - link - добавить ссылку
+     * - sticker - добавить стикер
 	 */
-	type: "inline" | "block" | "link";
+	type: "inline" | "block" | "link" | "sticker";
 	/**
 	 * Иконка для кнопки
 	 */
@@ -74,5 +75,12 @@ export const richTextControls: ToolControl[] = [
 		style: "",
 		icon: "Link",
 		tooltip: "Ссылка",
+    },
+    // ***TODO: Just for fun! Remove in production!***
+    {
+		type: "sticker",
+		style: "",
+		icon: "SentimentVerySatisfied",
+		tooltip: "Стикеры",
 	},
 ];
