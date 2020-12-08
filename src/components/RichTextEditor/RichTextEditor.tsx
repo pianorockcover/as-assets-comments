@@ -14,6 +14,7 @@ import {
 	convertMarkdownToDraft,
 	convertDraftToMarkdown,
 } from "./draftMarkdown";
+import { RichEditorContext } from "./RichEditorContext";
 
 const border = "1px solid #d2d2d2";
 
@@ -158,45 +159,55 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(
 			setSymbolsLeft(max - markdownString.length);
 		}, [editorState]);
 
+		const editorContextValue = useMemo(
+			() => ({
+				editorState,
+				setEditorState,
+			}),
+			[editorState]
+		);
+
 		return (
-			<div
-				className={clsx(
-					classes.richEditorWrapper,
-					{
-						[classes.richEditorWrapperFocus]: focus,
-					},
-					className
-				)}
-			>
-				<RichTextEditorTools
-					editorState={editorState}
-					setEditorState={setEditorState}
-					className={!focus ? classes.toolsUnfocus : undefined}
-				/>
+			<RichEditorContext.Provider value={editorContextValue}>
 				<div
-					className={clsx(classes.richEditorArea, {
-						[classes.richEditorAreaFocus]: focus,
-					})}
-					onClick={onClickArea}
+					className={clsx(
+						classes.richEditorWrapper,
+						{
+							[classes.richEditorWrapperFocus]: focus,
+						},
+						className
+					)}
 				>
-					<Editor
+					<RichTextEditorTools
 						editorState={editorState}
-						onChange={onChange}
-						spellCheck={true}
-						customStyleMap={styleMap}
-						onBlur={onBlur}
-						ref={ref}
-						placeholder={placeholder}
+						setEditorState={setEditorState}
+						className={!focus ? classes.toolsUnfocus : undefined}
 					/>
+					<div
+						className={clsx(classes.richEditorArea, {
+							[classes.richEditorAreaFocus]: focus,
+						})}
+						onClick={onClickArea}
+					>
+						<Editor
+							editorState={editorState}
+							onChange={onChange}
+							spellCheck={true}
+							customStyleMap={styleMap}
+							onBlur={onBlur}
+							ref={ref}
+							placeholder={placeholder}
+						/>
+					</div>
+					<span
+						className={clsx(classes.amountBar, {
+							[classes.amountBarError]: symbolsLeft <= 0,
+						})}
+					>
+						Осталось симолов: {symbolsLeft}
+					</span>
 				</div>
-				<span
-					className={clsx(classes.amountBar, {
-						[classes.amountBarError]: symbolsLeft <= 0,
-					})}
-				>
-					Осталось симолов: {symbolsLeft}
-				</span>
-			</div>
+			</RichEditorContext.Provider>
 		);
 	}
 );

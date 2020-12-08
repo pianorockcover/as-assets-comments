@@ -8,7 +8,7 @@ const useStyles = makeStyles({
 	linkPicker: {
 		top: 33,
 		left: 0,
-		zIndex: 2,
+		zIndex: 3,
 		position: "absolute",
 		background: "#fafdff",
 		borderBottom: "1px solid #d2d2d2",

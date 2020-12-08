@@ -13,22 +13,22 @@ const useStyles = makeStyles({
 	stickerPicker: {
 		top: 33,
 		left: 0,
-		zIndex: 2,
+		zIndex: 3,
 		position: "absolute",
 		background: "#ffffff",
 		borderBottom: "1px solid #d2d2d2",
 		boxShadow: "1px 1px 4px 0px #e4e1e1",
 		width: "100%",
 		height: "calc(100% - 100px)",
-        overflow: "auto",
+		overflow: "auto",
 	},
 	sticker: {
 		display: "inline-block",
 		width: 100,
 		cursor: "pointer",
 		verticalAlign: "middle",
-        transition: "opacity .2s linear",
-        backgroundColor: "#dddddd",        
+		transition: "opacity .2s linear",
+		backgroundColor: "#dddddd",
 		"&:hover": {
 			opacity: 0.8,
 		},
@@ -166,7 +166,7 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
 			const contentStateWithEntity = newContentState.createEntity(
 				"STICKER",
 				"IMMUTABLE",
-				{ type }
+				{ type, blockKey: newBlockKey }
 			);
 
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
@@ -201,11 +201,12 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
 	return (
 		<Fade in={true}>
 			<div className={classes.stickerPicker}>
-				{new Array(stickersAmount).fill(null).map((sticker, i) => (
+				{new Array(stickersAmount).fill(null).map((_, i) => (
 					<img
 						src={`${stickersPath}${i + 1}.gif`}
 						onClick={addSticker(i + 1)}
-						className={classes.sticker}
+                        className={classes.sticker}
+                        key={i}
 					/>
 				))}
 				<IconButton
