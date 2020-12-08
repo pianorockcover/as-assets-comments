@@ -15,6 +15,7 @@ const useStyles = makeStyles({
 		display: "flex",
 		maxWidth: "100%",
 		overflow: "auto",
+		background: "#fbfbfb",
 	},
 	btn: {
 		padding: 4,
@@ -167,7 +168,7 @@ export const RichTextEditorTools: React.FC<RichTextEditorToolsProps> = React.mem
 						setEditorState={setEditorState}
 					/>
 				)}
-                {/* ***TODO: Just for fun! Remove in production!*** */}
+				{/* ***TODO: Just for fun! Remove in production!*** */}
 				{stickerPicker && (
 					<StickerPicker
 						editorState={editorState}

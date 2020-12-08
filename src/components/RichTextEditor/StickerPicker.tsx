@@ -8,6 +8,7 @@ import {
 } from "draft-js";
 import React, { useCallback } from "react";
 import { getIcon } from "../icons";
+import { Loader } from "../Loader";
 
 const useStyles = makeStyles({
 	stickerPicker: {
@@ -24,19 +25,28 @@ const useStyles = makeStyles({
 	},
 	sticker: {
 		display: "inline-block",
-		width: 100,
+		width: 60,
+		position: "relative",
+		zIndex: 2,
 		cursor: "pointer",
 		verticalAlign: "middle",
-		transition: "opacity .2s linear",
-		backgroundColor: "#dddddd",
+		transition: "saturate .3s ease-in-out",
 		"&:hover": {
-			opacity: 0.8,
+			filter: "saturate(300%)",
 		},
 	},
 	close: {
 		position: "absolute",
 		right: 10,
-		top: 10,
+        top: 10,
+        zIndex: 3,
+	},
+	loader: {
+		position: "absolute",
+		zIndex: 1,
+		width: 100,
+		top: 70,
+		left: "calc(50% - 50px)",
 	},
 });
 
@@ -103,14 +113,17 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
 				selectionState.getStartKey()
 			);
 			const currentBlockKey = currentBlock.getKey();
-			const blockMap = contentState.getBlockMap();
+            const blockMap = contentState.getBlockMap();
+            
 			const blocksBefore = blockMap
 				.toSeq()
-				.takeUntil((v) => v === currentBlock);
+                .takeUntil((v) => v === currentBlock);
+                
 			const blocksAfter = blockMap
 				.toSeq()
 				.skipUntil((v) => v === currentBlock)
-				.rest();
+                .rest();
+                
 			const newBlockKey = genKey();
 
 			const newBlock = new ContentBlock({
@@ -201,12 +214,13 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
 	return (
 		<Fade in={true}>
 			<div className={classes.stickerPicker}>
+				<Loader className={classes.loader} />
 				{new Array(stickersAmount).fill(null).map((_, i) => (
 					<img
 						src={`${stickersPath}${i + 1}.gif`}
 						onClick={addSticker(i + 1)}
-                        className={classes.sticker}
-                        key={i}
+						className={classes.sticker}
+						key={i}
 					/>
 				))}
 				<IconButton

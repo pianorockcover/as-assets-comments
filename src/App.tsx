@@ -60,7 +60,7 @@ const useStyles = makeStyles({
 	},
 });
 
-function App() {
+const App: React.FC = () => {
 	const classes = useStyles();
 
 	const [comments, setComments] = useState<CommentProps[]>(fakeApiComments);
@@ -111,6 +111,6 @@ function App() {
 			<Comments data={comments} selfUserId={2} />
 		</CardLayout>
 	);
-}
+};
 
 export default App;

@@ -10,6 +10,10 @@ import Close from "@material-ui/icons/Close";
 import Check from "@material-ui/icons/Check";
 import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import ExpandMore from "@material-ui/icons/ExpandMore";
+import Info from "@material-ui/icons/Info";
+import Warning from "@material-ui/icons/Warning";
+import Error from "@material-ui/icons/Error";
+import CheckCircle from "@material-ui/icons/CheckCircle";
 
 const icons: {
 	[key: string]: OverridableComponent<SvgIconTypeMap<{}, "svg">>;
@@ -24,6 +28,10 @@ const icons: {
 	Check,
 	FormatListNumberedIcon,
 	ExpandMore,
+	Info,
+	Warning,
+	Error,
+	CheckCircle,
 };
 
 export const getIcon = (icon: string) => icons[icon];
